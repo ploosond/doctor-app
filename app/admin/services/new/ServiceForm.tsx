@@ -1,0 +1,377 @@
+"use client"
+
+import { useState } from "react"
+import Link from "next/link"
+
+type Lang = "en" | "ne"
+
+const inputStyle = {
+  width: "100%",
+  padding: "9px 12px",
+  borderRadius: 8,
+  border: "1.5px solid var(--color-accent)",
+  fontSize: 14,
+  color: "var(--color-text)",
+  boxSizing: "border-box" as const,
+  fontFamily: "var(--font-sans), sans-serif",
+  background: "#fff",
+}
+
+const labelStyle = {
+  display: "block",
+  fontSize: 12,
+  fontWeight: 700,
+  color: "var(--color-text-muted)",
+  textTransform: "uppercase" as const,
+  letterSpacing: "0.04em",
+  marginBottom: 5,
+}
+
+const sectionHead = {
+  fontFamily: "var(--font-sans), sans-serif",
+  fontWeight: 700,
+  fontSize: 13,
+  color: "var(--color-text)",
+  textTransform: "uppercase" as const,
+  letterSpacing: "0.05em",
+  margin: "0 0 14px",
+  paddingBottom: 8,
+  borderBottom: "1px solid rgba(23,42,58,0.08)",
+}
+
+const card = {
+  background: "#fff",
+  borderRadius: 14,
+  padding: "22px 24px",
+  boxShadow: "0 2px 8px rgba(23,42,58,0.06)",
+  marginBottom: 16,
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div style={{ marginBottom: 14 }}>
+      <label style={labelStyle}>{label}</label>
+      {children}
+    </div>
+  )
+}
+
+function LangTab({ lang, active, onClick }: { lang: Lang; active: boolean; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      style={{
+        padding: "7px 20px",
+        borderRadius: 8,
+        border: "1.5px solid var(--color-accent)",
+        background: active ? "var(--color-surface)" : "#fff",
+        color: active ? "var(--color-brand)" : "var(--color-text-muted)",
+        fontWeight: active ? 700 : 500,
+        fontSize: 13,
+        cursor: "pointer",
+      }}
+    >
+      {lang === "en" ? "English" : "Nepali (नेपाली)"}
+    </button>
+  )
+}
+
+function LocaleFields({ lang, included, setIncluded }: {
+  lang: Lang
+  included: string[]
+  setIncluded: (v: string[]) => void
+}) {
+  const p = lang === "ne" ? "Nepali — " : ""
+  return (
+    <div>
+      {/* Core text */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 14 }}>
+        <Field label="Name">
+          <input name={`${lang}_name`} type="text" placeholder={`${p}Service name`} style={inputStyle} />
+        </Field>
+        <Field label="Tag / badge">
+          <input name={`${lang}_tag`} type="text" placeholder={`${p}e.g. Consultation`} style={inputStyle} />
+        </Field>
+      </div>
+      <Field label="Headline (italic tagline)">
+        <input name={`${lang}_headline`} type="text" placeholder={`${p}Short tagline shown below the title`} style={inputStyle} />
+      </Field>
+      <Field label="Intro paragraph">
+        <textarea
+          name={`${lang}_intro`}
+          rows={3}
+          placeholder={`${p}2–4 sentence introduction`}
+          style={{ ...inputStyle, resize: "vertical" }}
+        />
+      </Field>
+
+      {/* Operational */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 14 }}>
+        <Field label="Duration">
+          <input name={`${lang}_duration`} type="text" placeholder={`${p}60 minutes`} style={inputStyle} />
+        </Field>
+        <Field label="Format">
+          <input name={`${lang}_format`} type="text" placeholder={`${p}In person or online`} style={inputStyle} />
+        </Field>
+        <Field label="Price">
+          <input name={`${lang}_price`} type="text" placeholder={`${p}From Rs. 2,000`} style={inputStyle} />
+        </Field>
+        <Field label="Follow-up">
+          <input name={`${lang}_followup`} type="text" placeholder={`${p}Within 1 week`} style={inputStyle} />
+        </Field>
+      </div>
+
+      {/* What's included */}
+      <div style={{ marginBottom: 14 }}>
+        <div style={{ ...labelStyle, marginBottom: 8 }}>What&apos;s included</div>
+        {included.map((_, i) => (
+          <div key={i} style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+            <input
+              name={`included_${lang}_${i}`}
+              type="text"
+              placeholder={`${p}Item ${i + 1}`}
+              style={{ ...inputStyle, flex: 1 }}
+            />
+            {included.length > 1 && (
+              <button
+                type="button"
+                onClick={() => setIncluded(included.filter((_, j) => j !== i))}
+                style={{
+                  padding: "0 12px",
+                  borderRadius: 7,
+                  border: "1.5px solid rgba(192,57,43,0.3)",
+                  background: "rgba(192,57,43,0.06)",
+                  color: "#c0392b",
+                  fontSize: 16,
+                  cursor: "pointer",
+                  flexShrink: 0,
+                }}
+              >
+                ×
+              </button>
+            )}
+          </div>
+        ))}
+        <button
+          type="button"
+          onClick={() => setIncluded([...included, ""])}
+          style={{
+            padding: "6px 14px",
+            borderRadius: 7,
+            border: "1.5px solid var(--color-accent)",
+            background: "var(--color-surface)",
+            color: "var(--color-brand)",
+            fontSize: 12,
+            fontWeight: 600,
+            cursor: "pointer",
+          }}
+        >
+          + Add item
+        </button>
+      </div>
+
+      {/* Steps */}
+      <div style={{ ...labelStyle, marginBottom: 10 }}>What to expect (3 steps)</div>
+      {[0, 1, 2].map((i) => (
+        <div
+          key={i}
+          style={{
+            background: "var(--color-surface)",
+            borderRadius: 10,
+            padding: "14px 16px",
+            marginBottom: 10,
+          }}
+        >
+          <div style={{ fontSize: 11, fontWeight: 700, color: "var(--color-brand)", marginBottom: 8 }}>
+            Step {i + 1}
+          </div>
+          <Field label="Title">
+            <input
+              name={`step_${lang}_${i}_title`}
+              type="text"
+              placeholder={`${p}Step title`}
+              style={inputStyle}
+            />
+          </Field>
+          <Field label="Description">
+            <textarea
+              name={`step_${lang}_${i}_desc`}
+              rows={2}
+              placeholder={`${p}Brief description`}
+              style={{ ...inputStyle, resize: "vertical" }}
+            />
+          </Field>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+export function ServiceForm({ action }: { action: (fd: FormData) => Promise<void> }) {
+  const [activeLang, setActiveLang] = useState<Lang>("en")
+  const [enIncluded, setEnIncluded] = useState(["", "", "", ""])
+  const [neIncluded, setNeIncluded] = useState(["", "", "", ""])
+  const [metaDesc, setMetaDesc] = useState("")
+  const [preview, setPreview] = useState<string | null>(null)
+
+  return (
+    <form action={action} encType="multipart/form-data">
+      {/* Service image */}
+      <div style={card}>
+        <div style={sectionHead}>Service image</div>
+        <div style={{ display: "flex", gap: 20, alignItems: "flex-start" }}>
+          {/* Preview */}
+          <div
+            style={{
+              width: 140,
+              height: 105,
+              borderRadius: 10,
+              overflow: "hidden",
+              border: "1.5px solid var(--color-accent)",
+              background: "var(--color-surface)",
+              flexShrink: 0,
+              display: "grid",
+              placeItems: "center",
+            }}
+          >
+            {preview ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={preview} alt="Preview" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            ) : (
+              <span style={{ fontSize: 11, color: "var(--color-text-muted)" }}>No image</span>
+            )}
+          </div>
+          <div style={{ flex: 1 }}>
+            <label style={labelStyle}>Upload image</label>
+            <input
+              name="image"
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0]
+                if (file) setPreview(URL.createObjectURL(file))
+              }}
+              style={{ fontSize: 13, color: "var(--color-text)" }}
+            />
+            <p style={{ fontSize: 12, color: "var(--color-text-muted)", margin: "6px 0 0" }}>
+              Uploaded to Cloudinary. Recommended: 800×600 JPG/PNG, under 2MB.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Shared: slug + visibility */}
+      <div style={card}>
+        <div style={sectionHead}>Identifier</div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 16, alignItems: "end" }}>
+          <Field label="Slug (URL key)">
+            <input
+              name="slug"
+              type="text"
+              required
+              placeholder="e.g. consult"
+              onBlur={(e) => { e.target.value = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-") }}
+              style={inputStyle}
+            />
+          </Field>
+          <div style={{ paddingBottom: 14 }}>
+            <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontSize: 14, fontWeight: 500, color: "var(--color-text)" }}>
+              <input name="visible" type="checkbox" defaultChecked style={{ width: 15, height: 15 }} />
+              Show on public site
+            </label>
+          </div>
+        </div>
+      </div>
+
+      {/* Language tabs */}
+      <div style={card}>
+        <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
+          <LangTab lang="en" active={activeLang === "en"} onClick={() => setActiveLang("en")} />
+          <LangTab lang="ne" active={activeLang === "ne"} onClick={() => setActiveLang("ne")} />
+        </div>
+
+        {/* Both rendered, only one visible — so all inputs submit */}
+        <div style={{ display: activeLang === "en" ? "block" : "none" }}>
+          <LocaleFields lang="en" included={enIncluded} setIncluded={setEnIncluded} />
+        </div>
+        <div style={{ display: activeLang === "ne" ? "block" : "none" }}>
+          <LocaleFields lang="ne" included={neIncluded} setIncluded={setNeIncluded} />
+        </div>
+      </div>
+
+      {/* SEO */}
+      <div style={card}>
+        <div style={sectionHead}>SEO & metadata</div>
+        <Field label="Meta title">
+          <input
+            name="metaTitle"
+            type="text"
+            placeholder="Leave blank to use English service name"
+            style={inputStyle}
+          />
+        </Field>
+        <Field label={`Meta description (${metaDesc.length}/160)`}>
+          <textarea
+            name="metaDescription"
+            rows={3}
+            maxLength={160}
+            value={metaDesc}
+            onChange={(e) => setMetaDesc(e.target.value)}
+            placeholder="Short description shown in Google results"
+            style={{ ...inputStyle, resize: "vertical" }}
+          />
+        </Field>
+        <Field label="Keywords (comma-separated)">
+          <input
+            name="keywords"
+            type="text"
+            placeholder="psychiatry, anxiety treatment, Kathmandu"
+            style={inputStyle}
+          />
+        </Field>
+        <Field label="OG image URL">
+          <input
+            name="ogImage"
+            type="text"
+            placeholder="https://…"
+            style={inputStyle}
+          />
+        </Field>
+      </div>
+
+      {/* Actions */}
+      <div style={{ display: "flex", gap: 12 }}>
+        <button
+          type="submit"
+          style={{
+            padding: "10px 24px",
+            borderRadius: 10,
+            background: "var(--color-brand)",
+            color: "#fff",
+            fontSize: 14,
+            fontWeight: 600,
+            border: "none",
+            cursor: "pointer",
+          }}
+        >
+          Create service
+        </button>
+        <Link
+          href="/admin/services"
+          style={{
+            padding: "10px 20px",
+            borderRadius: 10,
+            border: "1.5px solid var(--color-accent)",
+            color: "var(--color-text-muted)",
+            fontSize: 14,
+            fontWeight: 500,
+            textDecoration: "none",
+          }}
+        >
+          Cancel
+        </Link>
+      </div>
+    </form>
+  )
+}
