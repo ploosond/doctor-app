@@ -15,24 +15,14 @@ export function AboutSection() {
       id="about"
       style={{ width: "100%", background: "var(--color-surface)", margin: 0, padding: 0, overflow: "hidden" }}
     >
-      <div
-        style={{
-          maxWidth: 1300,
-          margin: "0 auto",
-          display: "grid",
-          gridTemplateColumns: "1fr 0.95fr 1fr",
-          gap: 40,
-          alignItems: "stretch",
-          minHeight: 560,
-        }}
-      >
+      <div className="section-inner grid-about">
         {/* Left */}
         <div
           style={{
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
-            padding: "72px 0 72px 28px",
+            padding: "clamp(36px,8vw,72px) 0 clamp(36px,8vw,72px) clamp(16px,4vw,28px)",
           }}
         >
           <h2
@@ -57,7 +47,7 @@ export function AboutSection() {
               color: "var(--color-text-muted)",
               lineHeight: 1.65,
               margin: "0 0 18px",
-              maxWidth: 380,
+              maxWidth: "clamp(260px,90%,380px)",
             }}
           >
             {t.about_p1}
@@ -68,7 +58,7 @@ export function AboutSection() {
               color: "var(--color-text-muted)",
               lineHeight: 1.65,
               margin: 0,
-              maxWidth: 380,
+              maxWidth: "clamp(260px,90%,380px)",
             }}
           >
             {t.about_p2}
@@ -86,9 +76,9 @@ export function AboutSection() {
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
+            className="about-photo"
             src="https://picsum.photos/seed/42/420/520"
             alt="Dr. Lila"
-            style={{ width: "100%", height: 520, objectFit: "cover", display: "block" }}
           />
         </div>
 
@@ -98,7 +88,7 @@ export function AboutSection() {
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
-            padding: "72px 28px 72px 0",
+            padding: "clamp(36px,8vw,72px) clamp(16px,4vw,28px) clamp(36px,8vw,72px) 0",
           }}
         >
           <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
@@ -140,7 +130,7 @@ export function AboutSection() {
       </div>
 
       {/* Where I practice strip */}
-      <div style={{ maxWidth: 1300, margin: "0 auto", padding: "0 28px 64px" }}>
+      <div className="section-container" style={{ paddingBottom: 64 }}>
         <div
           style={{
             borderTop: "1px solid rgba(23,42,58,0.14)",
@@ -162,7 +152,7 @@ export function AboutSection() {
           <div
             style={{
               fontFamily: "var(--font-heading), serif",
-              fontSize: 24,
+              fontSize: "clamp(18px,4vw,24px)",
               fontStyle: "italic",
               color: "var(--color-text)",
               lineHeight: 1.15,
@@ -171,13 +161,7 @@ export function AboutSection() {
           >
             {t.practice_head}
           </div>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(3,1fr)",
-              gap: 20,
-            }}
-          >
+          <div className="grid-3col" style={{ gap: 20 }}>
             {t.clinics.map((clinic) => (
               <div
                 key={clinic.name}
@@ -187,14 +171,16 @@ export function AboutSection() {
                   borderRadius: 16,
                   overflow: "hidden",
                   border: "1px solid rgba(23,42,58,0.08)",
+                  display: "flex",
+                  flexDirection: "column",
                 }}
               >
                 {/* Map embed */}
                 <iframe
                   src={`https://maps.google.com/maps?q=${encodeURIComponent(clinic.address)}&output=embed`}
                   width="100%"
-                  height="180"
-                  style={{ display: "block", border: "none" }}
+                  height="160"
+                  style={{ display: "block", border: "none", width: "100%", flex: 1, minHeight: 170 }}
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
                   title={clinic.name}

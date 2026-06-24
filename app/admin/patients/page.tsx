@@ -69,10 +69,10 @@ export default async function PatientsPage({
           defaultValue={q}
           placeholder="Search by name, phone or email…"
           style={{
-            padding: "10px 16px",
+            padding: "12px 18px",
             borderRadius: 10,
             border: "1.5px solid var(--color-accent)",
-            fontSize: 14,
+            fontSize: 16,
             color: "var(--color-text)",
             width: 320,
             outline: "none",
@@ -86,7 +86,7 @@ export default async function PatientsPage({
             padding: "60px",
             textAlign: "center",
             color: "var(--color-text-muted)",
-            fontSize: 14,
+            fontSize: 16,
             background: "var(--color-surface)",
             borderRadius: 12,
           }}
@@ -98,7 +98,7 @@ export default async function PatientsPage({
           style={{
             width: "100%",
             borderCollapse: "collapse",
-            fontSize: 14,
+            fontSize: 16,
             color: "var(--color-text)",
             background: "#fff",
             borderRadius: 14,
@@ -111,14 +111,14 @@ export default async function PatientsPage({
               style={{
                 background: "var(--color-surface)",
                 color: "var(--color-text-muted)",
-                fontSize: 12,
+                fontSize: 14,
                 fontWeight: 600,
                 textTransform: "uppercase",
                 letterSpacing: "0.04em",
               }}
             >
               {["Name", "Phone", "Email", "Appointments", "Registered", ""].map((h) => (
-                <th key={h} style={{ textAlign: "left", padding: "12px 16px", fontWeight: 600 }}>
+                <th key={h} style={{ textAlign: "left", padding: "14px 18px", fontWeight: 600 }}>
                   {h}
                 </th>
               ))}
@@ -129,24 +129,24 @@ export default async function PatientsPage({
               const pid = String(patient._id)
               return (
                 <tr key={pid} style={{ borderBottom: "1px solid rgba(23,42,58,0.06)" }}>
-                  <td style={{ padding: "12px 16px", fontWeight: 600 }}>{patient.name}</td>
-                  <td style={{ padding: "12px 16px" }}>{patient.phone}</td>
-                  <td style={{ padding: "12px 16px", color: "var(--color-text-muted)" }}>
+                  <td style={{ padding: "14px 18px", fontWeight: 600 }}>{patient.name}</td>
+                  <td style={{ padding: "14px 18px" }}>{patient.phone}</td>
+                  <td style={{ padding: "14px 18px", color: "var(--color-text-muted)" }}>
                     {patient.email ?? "—"}
                   </td>
-                  <td style={{ padding: "12px 16px" }}>{countMap[pid] ?? 0}</td>
-                  <td style={{ padding: "12px 16px", color: "var(--color-text-muted)" }}>
+                  <td style={{ padding: "14px 18px" }}>{countMap[pid] ?? 0}</td>
+                  <td style={{ padding: "14px 18px", color: "var(--color-text-muted)" }}>
                     {formatDate(patient.createdAt as Date)}
                   </td>
-                  <td style={{ padding: "12px 16px" }}>
+                  <td style={{ padding: "14px 18px" }}>
                     <Link
                       href={`/admin/patients/${pid}`}
                       style={{
-                        padding: "5px 12px",
+                        padding: "7px 14px",
                         borderRadius: 7,
                         background: "var(--color-surface)",
                         color: "var(--color-brand)",
-                        fontSize: 12,
+                        fontSize: 14,
                         fontWeight: 600,
                         textDecoration: "none",
                       }}

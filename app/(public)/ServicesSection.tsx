@@ -2,25 +2,37 @@
 
 import { useLang } from "@/lib/i18n";
 import { ArrowRight } from "lucide-react";
+import { motion, useReducedMotion } from "motion/react";
 
-const SERVICES = [
-  { titleKey: "svc1t" as const, groupKey: "svc1g" as const, id: "consult",  seed: 11 },
-  { titleKey: "svc2t" as const, groupKey: "svc2g" as const, id: "meds",     seed: 22 },
-  { titleKey: "svc3t" as const, groupKey: "svc3g" as const, id: "anxiety",  seed: 33 },
-  { titleKey: "svc4t" as const, groupKey: "svc4g" as const, id: "assess",   seed: 44 },
-  { titleKey: "svc5t" as const, groupKey: "svc5g" as const, id: "therapy",  seed: 55 },
-  { titleKey: "svc6t" as const, groupKey: "svc6g" as const, id: "wellness", seed: 66 },
-];
+const EASE = [0.22, 0.61, 0.36, 1] as const;
 
-export function ServicesSection({ serviceImages = {} }: { serviceImages?: Record<string, string | undefined> }) {
-  const { t } = useLang();
+export type ServiceCardData = {
+  slug: string
+  image?: string
+  name: string
+  tag: string
+  nameFallback: string
+  tagFallback: string
+}
+
+export function ServicesSection({ services }: { services: ServiceCardData[] }) {
+  const { lang, t } = useLang();
+  const reduce = useReducedMotion();
+
+  if (services.length === 0) return null;
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 60, scale: 0.94 },
+    show:   { opacity: 1, y: 0, scale: 1, transition: { duration: 0.6, ease: EASE } },
+  };
 
   return (
     <section
       id="services"
-      style={{ maxWidth: 1200, margin: "0 auto", padding: "70px 28px 40px" }}
+      className="section-container"
+      style={{ paddingTop: "clamp(36px,8vw,70px)", paddingBottom: "clamp(20px,5vw,40px)" }}
     >
-      <div style={{ maxWidth: 640, marginBottom: 40 }}>
+      <div style={{ maxWidth: "clamp(300px,90%,640px)", marginBottom: "clamp(24px,5vw,40px)" }}>
         <h2
           style={{
             fontFamily: "var(--font-heading), serif",
@@ -40,18 +52,22 @@ export function ServicesSection({ serviceImages = {} }: { serviceImages?: Record
         </p>
       </div>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(3,1fr)",
-          gap: 22,
-        }}
+      <motion.div
+        className="grid-3col"
+        initial={reduce ? false : "hidden"}
+        whileInView={reduce ? undefined : "show"}
+        viewport={{ once: true, amount: 0.2 }}
+        variants={reduce ? undefined : { show: { transition: { staggerChildren: 0.13 } } }}
       >
-        {SERVICES.map(({ titleKey, groupKey, id, seed }) => (
-          <a
-            key={id}
-            href={`/services/${id}`}
+        {services.map((svc) => {
+          const name = lang === "ne" ? svc.nameFallback : svc.name;
+          const tag  = lang === "ne" ? svc.tagFallback  : svc.tag;
+          return (
+          <motion.a
+            key={svc.slug}
+            href={`/services/${svc.slug}`}
             className="svc-card"
+            variants={reduce ? undefined : cardVariants}
             style={{
               display: "flex",
               flexDirection: "column",
@@ -63,12 +79,11 @@ export function ServicesSection({ serviceImages = {} }: { serviceImages?: Record
               boxShadow: "0 18px 50px -30px rgba(23,42,58,0.4)",
             }}
           >
-            {/* Service photo */}
             <div style={{ aspectRatio: "4/3", overflow: "hidden" }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 className="svc-img"
-                src={serviceImages[id] ?? `https://picsum.photos/seed/${seed}/400/300`}
+                src={svc.image ?? `https://picsum.photos/seed/${svc.slug}/400/300`}
                 alt=""
                 style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
               />
@@ -76,7 +91,7 @@ export function ServicesSection({ serviceImages = {} }: { serviceImages?: Record
 
             <div
               style={{
-                padding: "28px 26px 22px",
+                padding: "clamp(18px,4vw,28px) clamp(16px,3.5vw,26px) clamp(14px,3vw,22px)",
                 display: "flex",
                 flexDirection: "column",
                 flex: 1,
@@ -86,14 +101,14 @@ export function ServicesSection({ serviceImages = {} }: { serviceImages?: Record
                 style={{
                   fontFamily: "var(--font-sans), sans-serif",
                   fontWeight: 800,
-                  fontSize: 23,
+                  fontSize: "clamp(18px,3.5vw,23px)",
                   lineHeight: 1.16,
                   letterSpacing: "-0.01em",
                   color: "var(--color-text)",
                   margin: 0,
                 }}
               >
-                {t[titleKey]}
+                {name}
               </h3>
               <div style={{ flex: 1, minHeight: 26 }} />
               <div
@@ -106,7 +121,7 @@ export function ServicesSection({ serviceImages = {} }: { serviceImages?: Record
               >
                 <span
                   style={{
-                    padding: "8px 16px",
+                    padding: "clamp(6px,2vw,8px) clamp(10px,2.5vw,16px)",
                     borderRadius: 999,
                     background: "rgba(255,255,255,0.7)",
                     fontSize: 13,
@@ -115,16 +130,17 @@ export function ServicesSection({ serviceImages = {} }: { serviceImages?: Record
                     color: "var(--color-brand)",
                   }}
                 >
-                  {t[groupKey]}
+                  {tag}
                 </span>
                 <span className="svc-arrow">
                   <ArrowRight size={22} strokeWidth={2.2} color="var(--color-brand)" />
                 </span>
               </div>
             </div>
-          </a>
-        ))}
-      </div>
+          </motion.a>
+          );
+        })}
+      </motion.div>
     </section>
   );
 }

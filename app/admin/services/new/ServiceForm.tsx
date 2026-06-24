@@ -5,12 +5,24 @@ import Link from "next/link"
 
 type Lang = "en" | "ne"
 
+type LocaleContent = {
+  name: string; tag: string; headline: string; intro: string
+  duration: string; format: string; price: string; followup: string
+  included: string[]; steps: { title: string; desc: string }[]
+}
+
+export type ServiceDoc = {
+  slug: string; image?: string; visible: boolean
+  content: { en: LocaleContent; ne: LocaleContent }
+  metaTitle?: string; metaDescription?: string; keywords?: string[]; ogImage?: string
+}
+
 const inputStyle = {
   width: "100%",
-  padding: "9px 12px",
+  padding: "11px 14px",
   borderRadius: 8,
   border: "1.5px solid var(--color-accent)",
-  fontSize: 14,
+  fontSize: 16,
   color: "var(--color-text)",
   boxSizing: "border-box" as const,
   fontFamily: "var(--font-sans), sans-serif",
@@ -19,18 +31,18 @@ const inputStyle = {
 
 const labelStyle = {
   display: "block",
-  fontSize: 12,
+  fontSize: 14,
   fontWeight: 700,
   color: "var(--color-text-muted)",
   textTransform: "uppercase" as const,
   letterSpacing: "0.04em",
-  marginBottom: 5,
+  marginBottom: 6,
 }
 
 const sectionHead = {
   fontFamily: "var(--font-sans), sans-serif",
   fontWeight: 700,
-  fontSize: 13,
+  fontSize: 15,
   color: "var(--color-text)",
   textTransform: "uppercase" as const,
   letterSpacing: "0.05em",
@@ -68,7 +80,7 @@ function LangTab({ lang, active, onClick }: { lang: Lang; active: boolean; onCli
         background: active ? "var(--color-surface)" : "#fff",
         color: active ? "var(--color-brand)" : "var(--color-text-muted)",
         fontWeight: active ? 700 : 500,
-        fontSize: 13,
+        fontSize: 15,
         cursor: "pointer",
       }}
     >
@@ -77,10 +89,11 @@ function LangTab({ lang, active, onClick }: { lang: Lang; active: boolean; onCli
   )
 }
 
-function LocaleFields({ lang, included, setIncluded }: {
+function LocaleFields({ lang, included, setIncluded, defaults }: {
   lang: Lang
   included: string[]
   setIncluded: (v: string[]) => void
+  defaults?: LocaleContent
 }) {
   const p = lang === "ne" ? "Nepali — " : ""
   return (
@@ -88,19 +101,20 @@ function LocaleFields({ lang, included, setIncluded }: {
       {/* Core text */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 14 }}>
         <Field label="Name">
-          <input name={`${lang}_name`} type="text" placeholder={`${p}Service name`} style={inputStyle} />
+          <input name={`${lang}_name`} type="text" defaultValue={defaults?.name ?? ""} placeholder={`${p}Service name`} style={inputStyle} />
         </Field>
         <Field label="Tag / badge">
-          <input name={`${lang}_tag`} type="text" placeholder={`${p}e.g. Consultation`} style={inputStyle} />
+          <input name={`${lang}_tag`} type="text" defaultValue={defaults?.tag ?? ""} placeholder={`${p}e.g. Consultation`} style={inputStyle} />
         </Field>
       </div>
       <Field label="Headline (italic tagline)">
-        <input name={`${lang}_headline`} type="text" placeholder={`${p}Short tagline shown below the title`} style={inputStyle} />
+        <input name={`${lang}_headline`} type="text" defaultValue={defaults?.headline ?? ""} placeholder={`${p}Short tagline shown below the title`} style={inputStyle} />
       </Field>
       <Field label="Intro paragraph">
         <textarea
           name={`${lang}_intro`}
           rows={3}
+          defaultValue={defaults?.intro ?? ""}
           placeholder={`${p}2–4 sentence introduction`}
           style={{ ...inputStyle, resize: "vertical" }}
         />
@@ -109,27 +123,28 @@ function LocaleFields({ lang, included, setIncluded }: {
       {/* Operational */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 14 }}>
         <Field label="Duration">
-          <input name={`${lang}_duration`} type="text" placeholder={`${p}60 minutes`} style={inputStyle} />
+          <input name={`${lang}_duration`} type="text" defaultValue={defaults?.duration ?? ""} placeholder={`${p}60 minutes`} style={inputStyle} />
         </Field>
         <Field label="Format">
-          <input name={`${lang}_format`} type="text" placeholder={`${p}In person or online`} style={inputStyle} />
+          <input name={`${lang}_format`} type="text" defaultValue={defaults?.format ?? ""} placeholder={`${p}In person or online`} style={inputStyle} />
         </Field>
         <Field label="Price">
-          <input name={`${lang}_price`} type="text" placeholder={`${p}From Rs. 2,000`} style={inputStyle} />
+          <input name={`${lang}_price`} type="text" defaultValue={defaults?.price ?? ""} placeholder={`${p}From Rs. 2,000`} style={inputStyle} />
         </Field>
         <Field label="Follow-up">
-          <input name={`${lang}_followup`} type="text" placeholder={`${p}Within 1 week`} style={inputStyle} />
+          <input name={`${lang}_followup`} type="text" defaultValue={defaults?.followup ?? ""} placeholder={`${p}Within 1 week`} style={inputStyle} />
         </Field>
       </div>
 
       {/* What's included */}
       <div style={{ marginBottom: 14 }}>
         <div style={{ ...labelStyle, marginBottom: 8 }}>What&apos;s included</div>
-        {included.map((_, i) => (
+        {included.map((val, i) => (
           <div key={i} style={{ display: "flex", gap: 8, marginBottom: 8 }}>
             <input
               name={`included_${lang}_${i}`}
               type="text"
+              defaultValue={val}
               placeholder={`${p}Item ${i + 1}`}
               style={{ ...inputStyle, flex: 1 }}
             />
@@ -162,7 +177,7 @@ function LocaleFields({ lang, included, setIncluded }: {
             border: "1.5px solid var(--color-accent)",
             background: "var(--color-surface)",
             color: "var(--color-brand)",
-            fontSize: 12,
+            fontSize: 14,
             fontWeight: 600,
             cursor: "pointer",
           }}
@@ -183,13 +198,14 @@ function LocaleFields({ lang, included, setIncluded }: {
             marginBottom: 10,
           }}
         >
-          <div style={{ fontSize: 11, fontWeight: 700, color: "var(--color-brand)", marginBottom: 8 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "var(--color-brand)", marginBottom: 8 }}>
             Step {i + 1}
           </div>
           <Field label="Title">
             <input
               name={`step_${lang}_${i}_title`}
               type="text"
+              defaultValue={defaults?.steps?.[i]?.title ?? ""}
               placeholder={`${p}Step title`}
               style={inputStyle}
             />
@@ -198,6 +214,7 @@ function LocaleFields({ lang, included, setIncluded }: {
             <textarea
               name={`step_${lang}_${i}_desc`}
               rows={2}
+              defaultValue={defaults?.steps?.[i]?.desc ?? ""}
               placeholder={`${p}Brief description`}
               style={{ ...inputStyle, resize: "vertical" }}
             />
@@ -208,12 +225,17 @@ function LocaleFields({ lang, included, setIncluded }: {
   )
 }
 
-export function ServiceForm({ action }: { action: (fd: FormData) => Promise<void> }) {
+export function ServiceForm({ action, initialData }: { action: (fd: FormData) => Promise<void>; initialData?: ServiceDoc }) {
+  const isEdit = !!initialData
   const [activeLang, setActiveLang] = useState<Lang>("en")
-  const [enIncluded, setEnIncluded] = useState(["", "", "", ""])
-  const [neIncluded, setNeIncluded] = useState(["", "", "", ""])
-  const [metaDesc, setMetaDesc] = useState("")
-  const [preview, setPreview] = useState<string | null>(null)
+  const [enIncluded, setEnIncluded] = useState(() =>
+    initialData?.content.en.included?.length ? [...initialData.content.en.included] : ["", "", "", ""]
+  )
+  const [neIncluded, setNeIncluded] = useState(() =>
+    initialData?.content.ne.included?.length ? [...initialData.content.ne.included] : ["", "", "", ""]
+  )
+  const [metaDesc, setMetaDesc] = useState(initialData?.metaDescription ?? "")
+  const [preview, setPreview] = useState<string | null>(initialData?.image ?? null)
 
   return (
     <form action={action} encType="multipart/form-data">
@@ -239,7 +261,7 @@ export function ServiceForm({ action }: { action: (fd: FormData) => Promise<void
               // eslint-disable-next-line @next/next/no-img-element
               <img src={preview} alt="Preview" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
             ) : (
-              <span style={{ fontSize: 11, color: "var(--color-text-muted)" }}>No image</span>
+              <span style={{ fontSize: 13, color: "var(--color-text-muted)" }}>No image</span>
             )}
           </div>
           <div style={{ flex: 1 }}>
@@ -252,10 +274,10 @@ export function ServiceForm({ action }: { action: (fd: FormData) => Promise<void
                 const file = e.target.files?.[0]
                 if (file) setPreview(URL.createObjectURL(file))
               }}
-              style={{ fontSize: 13, color: "var(--color-text)" }}
+              style={{ fontSize: 15, color: "var(--color-text)" }}
             />
-            <p style={{ fontSize: 12, color: "var(--color-text-muted)", margin: "6px 0 0" }}>
-              Uploaded to Cloudinary. Recommended: 800×600 JPG/PNG, under 2MB.
+            <p style={{ fontSize: 14, color: "var(--color-text-muted)", margin: "6px 0 0" }}>
+              Uploaded to Cloudinary. Recommended: 800×600 JPG/PNG, under 8MB.
             </p>
           </div>
         </div>
@@ -270,14 +292,18 @@ export function ServiceForm({ action }: { action: (fd: FormData) => Promise<void
               name="slug"
               type="text"
               required
+              readOnly={isEdit}
+              defaultValue={initialData?.slug ?? ""}
               placeholder="e.g. consult"
-              onBlur={(e) => { e.target.value = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-") }}
-              style={inputStyle}
+              onBlur={(e) => {
+                if (!isEdit) e.target.value = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-")
+              }}
+              style={{ ...inputStyle, ...(isEdit ? { background: "var(--color-surface)", color: "var(--color-text-muted)" } : {}) }}
             />
           </Field>
           <div style={{ paddingBottom: 14 }}>
-            <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontSize: 14, fontWeight: 500, color: "var(--color-text)" }}>
-              <input name="visible" type="checkbox" defaultChecked style={{ width: 15, height: 15 }} />
+            <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontSize: 16, fontWeight: 500, color: "var(--color-text)" }}>
+              <input name="visible" type="checkbox" defaultChecked={initialData?.visible ?? true} style={{ width: 15, height: 15 }} />
               Show on public site
             </label>
           </div>
@@ -293,10 +319,10 @@ export function ServiceForm({ action }: { action: (fd: FormData) => Promise<void
 
         {/* Both rendered, only one visible — so all inputs submit */}
         <div style={{ display: activeLang === "en" ? "block" : "none" }}>
-          <LocaleFields lang="en" included={enIncluded} setIncluded={setEnIncluded} />
+          <LocaleFields lang="en" included={enIncluded} setIncluded={setEnIncluded} defaults={initialData?.content.en} />
         </div>
         <div style={{ display: activeLang === "ne" ? "block" : "none" }}>
-          <LocaleFields lang="ne" included={neIncluded} setIncluded={setNeIncluded} />
+          <LocaleFields lang="ne" included={neIncluded} setIncluded={setNeIncluded} defaults={initialData?.content.ne} />
         </div>
       </div>
 
@@ -307,6 +333,7 @@ export function ServiceForm({ action }: { action: (fd: FormData) => Promise<void
           <input
             name="metaTitle"
             type="text"
+            defaultValue={initialData?.metaTitle ?? ""}
             placeholder="Leave blank to use English service name"
             style={inputStyle}
           />
@@ -326,6 +353,7 @@ export function ServiceForm({ action }: { action: (fd: FormData) => Promise<void
           <input
             name="keywords"
             type="text"
+            defaultValue={initialData?.keywords?.join(", ") ?? ""}
             placeholder="psychiatry, anxiety treatment, Kathmandu"
             style={inputStyle}
           />
@@ -334,6 +362,7 @@ export function ServiceForm({ action }: { action: (fd: FormData) => Promise<void
           <input
             name="ogImage"
             type="text"
+            defaultValue={initialData?.ogImage ?? ""}
             placeholder="https://…"
             style={inputStyle}
           />
@@ -345,26 +374,26 @@ export function ServiceForm({ action }: { action: (fd: FormData) => Promise<void
         <button
           type="submit"
           style={{
-            padding: "10px 24px",
+            padding: "12px 28px",
             borderRadius: 10,
             background: "var(--color-brand)",
             color: "#fff",
-            fontSize: 14,
+            fontSize: 16,
             fontWeight: 600,
             border: "none",
             cursor: "pointer",
           }}
         >
-          Create service
+          {isEdit ? "Update service" : "Create service"}
         </button>
         <Link
           href="/admin/services"
           style={{
-            padding: "10px 20px",
+            padding: "12px 24px",
             borderRadius: 10,
             border: "1.5px solid var(--color-accent)",
             color: "var(--color-text-muted)",
-            fontSize: 14,
+            fontSize: 16,
             fontWeight: 500,
             textDecoration: "none",
           }}

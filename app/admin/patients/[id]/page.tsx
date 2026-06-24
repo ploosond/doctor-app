@@ -51,7 +51,7 @@ export default async function PatientDetailPage({
   return (
     <div style={{ padding: "36px 40px" }}>
       {/* Breadcrumb */}
-      <div style={{ fontSize: 13, color: "var(--color-text-muted)", marginBottom: 20 }}>
+      <div style={{ fontSize: 15, color: "var(--color-text-muted)", marginBottom: 20 }}>
         <Link href="/admin/patients" style={{ color: "var(--color-text-muted)", textDecoration: "none" }}>
           Patients
         </Link>
@@ -88,7 +88,7 @@ export default async function PatientDetailPage({
               style={{
                 fontFamily: "var(--font-sans), sans-serif",
                 fontWeight: 700,
-                fontSize: 14,
+                fontSize: 16,
                 color: "var(--color-text)",
                 margin: "0 0 16px",
                 textTransform: "uppercase",
@@ -117,9 +117,9 @@ export default async function PatientDetailPage({
                   display: "flex",
                   justifyContent: "space-between",
                   gap: 12,
-                  padding: "9px 0",
+                  padding: "10px 0",
                   borderBottom: "1px solid rgba(23,42,58,0.07)",
-                  fontSize: 14,
+                  fontSize: 16,
                 }}
               >
                 <span style={{ color: "var(--color-text-muted)", fontWeight: 500 }}>{label}</span>
@@ -143,7 +143,7 @@ export default async function PatientDetailPage({
               style={{
                 fontFamily: "var(--font-sans), sans-serif",
                 fontWeight: 700,
-                fontSize: 14,
+                fontSize: 16,
                 color: "var(--color-text)",
                 margin: "0 0 12px",
                 textTransform: "uppercase",
@@ -164,10 +164,10 @@ export default async function PatientDetailPage({
                 rows={5}
                 style={{
                   width: "100%",
-                  padding: "10px 12px",
+                  padding: "12px 14px",
                   borderRadius: 8,
                   border: "1.5px solid var(--color-accent)",
-                  fontSize: 14,
+                  fontSize: 16,
                   color: "var(--color-text)",
                   resize: "vertical",
                   boxSizing: "border-box",
@@ -178,11 +178,11 @@ export default async function PatientDetailPage({
                 type="submit"
                 style={{
                   marginTop: 8,
-                  padding: "7px 16px",
+                  padding: "9px 18px",
                   borderRadius: 7,
                   background: "var(--color-surface)",
                   color: "var(--color-brand)",
-                  fontSize: 13,
+                  fontSize: 15,
                   fontWeight: 600,
                   border: "1.5px solid var(--color-brand)",
                   cursor: "pointer",
@@ -218,23 +218,23 @@ export default async function PatientDetailPage({
           </h2>
 
           {appointments.length === 0 ? (
-            <p style={{ color: "var(--color-text-muted)", fontSize: 14 }}>No appointments yet.</p>
+            <p style={{ color: "var(--color-text-muted)", fontSize: 16 }}>No appointments yet.</p>
           ) : (
             <table
-              style={{ width: "100%", borderCollapse: "collapse", fontSize: 14, color: "var(--color-text)" }}
+              style={{ width: "100%", borderCollapse: "collapse", fontSize: 16, color: "var(--color-text)" }}
             >
               <thead>
                 <tr
                   style={{
                     color: "var(--color-text-muted)",
-                    fontSize: 12,
+                    fontSize: 14,
                     fontWeight: 600,
                     textTransform: "uppercase",
                     letterSpacing: "0.04em",
                   }}
                 >
                   {["Service", "Date", "Status", ""].map((h) => (
-                    <th key={h} style={{ textAlign: "left", padding: "6px 10px", fontWeight: 600 }}>
+                    <th key={h} style={{ textAlign: "left", padding: "8px 12px", fontWeight: 600 }}>
                       {h}
                     </th>
                   ))}
@@ -246,17 +246,17 @@ export default async function PatientDetailPage({
                     key={String(appt._id)}
                     style={{ borderBottom: "1px solid rgba(23,42,58,0.06)" }}
                   >
-                    <td style={{ padding: "10px", textTransform: "capitalize" }}>{appt.service}</td>
-                    <td style={{ padding: "10px", color: "var(--color-text-muted)" }}>
+                    <td style={{ padding: "12px", textTransform: "capitalize" }}>{appt.service}</td>
+                    <td style={{ padding: "12px", color: "var(--color-text-muted)" }}>
                       {formatDate(appt.slotStart as Date)}
                     </td>
-                    <td style={{ padding: "10px" }}>
+                    <td style={{ padding: "12px" }}>
                       <span
                         style={{
                           display: "inline-block",
-                          padding: "2px 8px",
+                          padding: "4px 10px",
                           borderRadius: 999,
-                          fontSize: 11,
+                          fontSize: 13,
                           fontWeight: 600,
                           background: `${STATUS_COLOR[appt.status as string]}18`,
                           color: STATUS_COLOR[appt.status as string],
@@ -265,11 +265,11 @@ export default async function PatientDetailPage({
                         {STATUS_LABEL[appt.status as string] ?? appt.status}
                       </span>
                     </td>
-                    <td style={{ padding: "10px" }}>
+                    <td style={{ padding: "12px" }}>
                       <Link
                         href={`/admin/appointments/${String(appt._id)}`}
                         style={{
-                          fontSize: 12,
+                          fontSize: 14,
                           color: "var(--color-brand)",
                           textDecoration: "none",
                           fontWeight: 600,

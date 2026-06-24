@@ -14,7 +14,7 @@ export function FAQSection() {
       style={{
         maxWidth: 820,
         margin: "0 auto",
-        padding: "60px 28px 80px",
+        padding: "clamp(32px,8vw,60px) clamp(16px,4vw,28px) clamp(44px,10vw,80px)",
       }}
     >
       <div style={{ textAlign: "center", marginBottom: 48 }}>
@@ -54,7 +54,7 @@ export function FAQSection() {
                 alignItems: "center",
                 justifyContent: "space-between",
                 gap: 16,
-                padding: "20px 22px",
+                padding: "clamp(14px,3vw,20px) clamp(14px,3vw,22px)",
                 background: "none",
                 border: "none",
                 cursor: "pointer",
@@ -85,7 +85,7 @@ export function FAQSection() {
             {open === i && (
               <div
                 style={{
-                  padding: "0 22px 20px",
+                  padding: "0 clamp(14px,3vw,22px) clamp(14px,3vw,20px)",
                   fontSize: 15.5,
                   lineHeight: 1.65,
                   color: "var(--color-text-muted)",

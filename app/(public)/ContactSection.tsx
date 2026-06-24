@@ -12,19 +12,10 @@ export function ContactSection() {
       style={{
         width: "100%",
         background: "var(--color-surface)",
-        padding: "80px 28px",
+        padding: "clamp(44px,10vw,80px) 0",
       }}
     >
-      <div
-        style={{
-          maxWidth: 1200,
-          margin: "0 auto",
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: 60,
-          alignItems: "center",
-        }}
-      >
+      <div className="section-container grid-2col">
         {/* Left */}
         <div>
           <h2
@@ -45,8 +36,8 @@ export function ContactSection() {
               fontSize: 16.5,
               color: "var(--color-text-muted)",
               lineHeight: 1.65,
-              margin: "0 0 36px",
-              maxWidth: 460,
+              margin: "0 0 clamp(20px,5vw,36px)",
+              maxWidth: "clamp(260px,90%,460px)",
             }}
           >
             {t.contact_intro}
@@ -62,7 +53,7 @@ export function ContactSection() {
               color: "#fff",
               fontWeight: 700,
               fontSize: 16,
-              padding: "16px 32px",
+              padding: "clamp(12px,3vw,16px) clamp(18px,4vw,32px)",
               borderRadius: 999,
               background: "var(--color-brand)",
             }}

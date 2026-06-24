@@ -102,7 +102,7 @@ export default async function DashboardPage() {
             >
               {value}
             </div>
-            <div style={{ fontSize: 13, color: "var(--color-text-muted)", fontWeight: 500 }}>
+            <div style={{ fontSize: 15, color: "var(--color-text-muted)", fontWeight: 500 }}>
               {label}
             </div>
           </div>
@@ -123,7 +123,7 @@ export default async function DashboardPage() {
             style={{
               fontFamily: "var(--font-sans), sans-serif",
               fontWeight: 700,
-              fontSize: 16,
+              fontSize: 18,
               color: "var(--color-text)",
               margin: 0,
             }}
@@ -133,7 +133,7 @@ export default async function DashboardPage() {
           <Link
             href="/admin/appointments"
             style={{
-              fontSize: 13,
+              fontSize: 15,
               color: "var(--color-brand)",
               textDecoration: "none",
               fontWeight: 600,
@@ -149,7 +149,7 @@ export default async function DashboardPage() {
               padding: "40px",
               textAlign: "center",
               color: "var(--color-text-muted)",
-              fontSize: 14,
+              fontSize: 16,
               background: "var(--color-surface)",
               borderRadius: 12,
             }}
@@ -161,7 +161,7 @@ export default async function DashboardPage() {
             style={{
               width: "100%",
               borderCollapse: "collapse",
-              fontSize: 14,
+              fontSize: 16,
               color: "var(--color-text)",
             }}
           >
@@ -170,14 +170,14 @@ export default async function DashboardPage() {
                 style={{
                   borderBottom: "1px solid rgba(23,42,58,0.1)",
                   color: "var(--color-text-muted)",
-                  fontSize: 12,
+                  fontSize: 14,
                   fontWeight: 600,
                   textTransform: "uppercase",
                   letterSpacing: "0.04em",
                 }}
               >
                 {["Patient", "Service", "Date", "Status"].map((h) => (
-                  <th key={h} style={{ textAlign: "left", padding: "8px 12px", fontWeight: 600 }}>
+                  <th key={h} style={{ textAlign: "left", padding: "10px 14px", fontWeight: 600 }}>
                     {h}
                   </th>
                 ))}
@@ -188,18 +188,18 @@ export default async function DashboardPage() {
                 const patient = appt.patientRef as unknown as { name: string }
                 return (
                   <tr key={String(appt._id)} style={{ borderBottom: "1px solid rgba(23,42,58,0.06)" }}>
-                    <td style={{ padding: "12px" }}>{patient?.name ?? "—"}</td>
-                    <td style={{ padding: "12px", textTransform: "capitalize" }}>{appt.service}</td>
-                    <td style={{ padding: "12px", color: "var(--color-text-muted)" }}>
+                    <td style={{ padding: "14px" }}>{patient?.name ?? "—"}</td>
+                    <td style={{ padding: "14px", textTransform: "capitalize" }}>{appt.service}</td>
+                    <td style={{ padding: "14px", color: "var(--color-text-muted)" }}>
                       {formatDate(appt.slotStart as Date)}
                     </td>
-                    <td style={{ padding: "12px" }}>
+                    <td style={{ padding: "14px" }}>
                       <span
                         style={{
                           display: "inline-block",
-                          padding: "3px 10px",
+                          padding: "5px 12px",
                           borderRadius: 999,
-                          fontSize: 12,
+                          fontSize: 14,
                           fontWeight: 600,
                           background: `${STATUS_COLOR[appt.status as string]}18`,
                           color: STATUS_COLOR[appt.status as string],

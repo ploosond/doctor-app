@@ -16,7 +16,7 @@ export function TestimonialsSection() {
   return (
     <section
       data-screen-label="Testimonials"
-      style={{ width: "100%", padding: "60px 0", overflow: "hidden" }}
+      style={{ width: "100%", padding: "clamp(32px,8vw,60px) 0", overflow: "hidden" }}
     >
       <div
         style={{
@@ -53,10 +53,10 @@ export function TestimonialsSection() {
               <div
                 key={i}
                 style={{
-                  width: 320,
+                  width: "clamp(280px,80vw,320px)",
                   flexShrink: 0,
                   borderRadius: 22,
-                  padding: "28px 28px 24px",
+                  padding: "clamp(18px,4vw,28px)",
                   background: style.bg,
                   display: "flex",
                   flexDirection: "column",

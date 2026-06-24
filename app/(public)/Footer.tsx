@@ -1,60 +1,25 @@
-"use client";
+"use client"
 
-import { useLang } from "@/lib/i18n";
+import { useLang } from "@/lib/i18n"
+import { Logo } from "@/components/Logo"
 
 export function Footer() {
-  const { t } = useLang();
+  const { t } = useLang()
 
   return (
     <footer
       style={{
         width: "100%",
         background: "var(--color-surface)",
-        padding: "48px 28px 32px",
+        padding: "clamp(28px,6vw,48px) 0 clamp(18px,4vw,32px)",
       }}
     >
-      <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "2fr 1fr 1fr",
-            gap: 48,
-            marginBottom: 48,
-          }}
-        >
+      <div className='section-container'>
+        <div className='grid-footer'>
           {/* Brand */}
           <div>
-            <div
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                padding: "10px 22px",
-                borderRadius: 999,
-                background: "var(--color-brand)",
-                marginBottom: 18,
-              }}
-            >
-              <span
-                style={{
-                  fontFamily: "var(--font-sans), sans-serif",
-                  fontWeight: 800,
-                  fontSize: 20,
-                  letterSpacing: "-0.03em",
-                  color: "#fff",
-                }}
-              >
-                dr.lila
-              </span>
-              <span
-                style={{
-                  width: 5,
-                  height: 5,
-                  borderRadius: "50%",
-                  background: "#fff",
-                  alignSelf: "flex-end",
-                  margin: "0 0 3px 2px",
-                }}
-              />
+            <div style={{ marginBottom: 18 }}>
+              <Logo height={54} />
             </div>
             <p
               style={{
@@ -62,7 +27,7 @@ export function Footer() {
                 color: "var(--color-text-muted)",
                 lineHeight: 1.65,
                 margin: 0,
-                maxWidth: 300,
+                maxWidth: "clamp(240px,90%,300px)",
               }}
             >
               {t.footer_desc}
@@ -102,10 +67,12 @@ export function Footer() {
                     transition: "color 0.15s",
                   }}
                   onMouseEnter={(e) =>
-                    ((e.target as HTMLElement).style.color = "var(--color-brand)")
+                    ((e.target as HTMLElement).style.color =
+                      "var(--color-brand)")
                   }
                   onMouseLeave={(e) =>
-                    ((e.target as HTMLElement).style.color = "var(--color-text-muted)")
+                    ((e.target as HTMLElement).style.color =
+                      "var(--color-text-muted)")
                   }
                 >
                   {label}
@@ -132,7 +99,7 @@ export function Footer() {
               {[t.privacy, t.terms].map((label) => (
                 <a
                   key={label}
-                  href="#"
+                  href='#'
                   style={{
                     textDecoration: "none",
                     color: "var(--color-text-muted)",
@@ -141,10 +108,12 @@ export function Footer() {
                     transition: "color 0.15s",
                   }}
                   onMouseEnter={(e) =>
-                    ((e.target as HTMLElement).style.color = "var(--color-brand)")
+                    ((e.target as HTMLElement).style.color =
+                      "var(--color-brand)")
                   }
                   onMouseLeave={(e) =>
-                    ((e.target as HTMLElement).style.color = "var(--color-text-muted)")
+                    ((e.target as HTMLElement).style.color =
+                      "var(--color-text-muted)")
                   }
                 >
                   {label}
@@ -162,11 +131,11 @@ export function Footer() {
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: 8,
           }}
         >
-          <span
-            style={{ fontSize: 13, color: "var(--color-text-muted)" }}
-          >
+          <span style={{ fontSize: 13, color: "var(--color-text-muted)" }}>
             {t.copyright}
           </span>
           {/* Crisis notice */}
@@ -182,5 +151,5 @@ export function Footer() {
         </div>
       </div>
     </footer>
-  );
+  )
 }

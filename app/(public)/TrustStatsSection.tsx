@@ -17,21 +17,21 @@ export function TrustStatsSection() {
       style={{
         width: "100%",
         background: "var(--color-surface)",
-        padding: "80px 28px",
+        padding: "clamp(44px,10vh,80px) 0",
       }}
     >
-      <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+      <div className="section-container">
         <div
           style={{
             display: "flex",
             justifyContent: "center",
-            marginBottom: 50,
+            marginBottom: "clamp(30px,7vh,50px)",
           }}
         >
           <span
             style={{
               display: "inline-block",
-              padding: "8px 22px",
+              padding: "clamp(6px,2vw,8px) clamp(14px,4vw,22px)",
               borderRadius: 999,
               border: "1px solid var(--color-accent)",
               fontSize: 14,
@@ -43,18 +43,12 @@ export function TrustStatsSection() {
             {t.why_badge}
           </span>
         </div>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(4,1fr)",
-            gap: 0,
-          }}
-        >
+        <div className="grid-stats">
           {STATS.map(({ valKey, labelKey }, i) => (
             <div
               key={i}
               style={{
-                padding: "0 32px",
+                padding: "0 clamp(12px,3vw,32px)",
                 borderRight:
                   i < 3 ? "1px solid var(--color-accent)" : "none",
               }}

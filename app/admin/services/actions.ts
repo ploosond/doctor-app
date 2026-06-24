@@ -2,7 +2,7 @@
 
 import { connectDB } from "@/lib/db"
 import { ServiceModel } from "@/models/service"
-import { uploadImage } from "@/lib/cloudinary"
+import { uploadImage, deleteImage } from "@/lib/cloudinary"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 
@@ -74,6 +74,72 @@ export async function createService(fd: FormData) {
     ogImage:         (fd.get("ogImage") as string) || undefined,
   })
 
+  revalidatePath("/admin/services")
+  revalidatePath("/")
+  redirect("/admin/services")
+}
+
+export async function updateService(slug: string, fd: FormData) {
+  await connectDB()
+  const svc = await ServiceModel.findOne({ slug })
+  if (!svc) throw new Error("Service not found")
+
+  const keywords = ((fd.get("keywords") as string) ?? "")
+    .split(",").map((k) => k.trim()).filter(Boolean)
+
+  const imageFile = fd.get("image") as File | null
+  if (imageFile && imageFile.size > 0) {
+    const oldImage = svc.image
+    svc.image = await uploadImage(imageFile)   // upload first
+    if (oldImage) await deleteImage(oldImage)  // delete old only on success
+  }
+
+  svc.visible = fd.get("visible") === "on"
+  svc.content = {
+    en: {
+      name:     fd.get("en_name"),
+      tag:      fd.get("en_tag"),
+      headline: fd.get("en_headline"),
+      intro:    fd.get("en_intro"),
+      duration: fd.get("en_duration"),
+      format:   fd.get("en_format"),
+      price:    fd.get("en_price"),
+      followup: fd.get("en_followup"),
+      included: parseIncluded(fd, "en"),
+      steps:    parseSteps(fd, "en"),
+    },
+    ne: {
+      name:     fd.get("ne_name"),
+      tag:      fd.get("ne_tag"),
+      headline: fd.get("ne_headline"),
+      intro:    fd.get("ne_intro"),
+      duration: fd.get("ne_duration"),
+      format:   fd.get("ne_format"),
+      price:    fd.get("ne_price"),
+      followup: fd.get("ne_followup"),
+      included: parseIncluded(fd, "ne"),
+      steps:    parseSteps(fd, "ne"),
+    },
+  }
+  svc.metaTitle       = (fd.get("metaTitle") as string) || undefined
+  svc.metaDescription = (fd.get("metaDescription") as string) || undefined
+  svc.keywords        = keywords
+  svc.ogImage         = (fd.get("ogImage") as string) || undefined
+
+  await svc.save()
+  revalidatePath("/admin/services")
+  revalidatePath(`/services/${slug}`)
+  revalidatePath("/")
+  redirect("/admin/services")
+}
+
+export async function deleteService(slug: string) {
+  await connectDB()
+  const svc = await ServiceModel.findOne({ slug })
+  if (svc) {
+    if (svc.image) await deleteImage(svc.image)
+    await ServiceModel.deleteOne({ slug })
+  }
   revalidatePath("/admin/services")
   revalidatePath("/")
   redirect("/admin/services")

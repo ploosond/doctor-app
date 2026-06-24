@@ -1,6 +1,9 @@
 "use client"
 
 import { useLang } from "@/lib/i18n"
+import { motion, useReducedMotion } from "motion/react"
+
+const EASE = [0.22, 0.61, 0.36, 1] as const
 
 const STEPS = [
   {
@@ -31,11 +34,13 @@ const STEPS = [
 
 export function CareJourneySection() {
   const { t } = useLang()
+  const reduce = useReducedMotion()
 
   return (
     <section
       id='journey'
-      style={{ maxWidth: 1200, margin: "0 auto", padding: "30px 28px 60px" }}
+      className="section-container"
+      style={{ paddingTop: "clamp(16px,4vw,30px)", paddingBottom: "clamp(30px,8vw,60px)" }}
     >
       <div
         style={{
@@ -60,29 +65,54 @@ export function CareJourneySection() {
         </h2>
       </div>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(4,1fr)",
-          gap: 22,
-          alignItems: "start",
-        }}
-      >
-        {STEPS.map(({ num, titleKey, descKey, offset }, i) => {
+      <div style={{ position: "relative" }}>
+        <svg
+          className="journey-path"
+          viewBox="0 0 1000 220"
+          preserveAspectRatio="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M 40 70 C 190 70, 210 150, 360 150 S 560 70, 690 70 S 860 150, 980 150"
+            fill="none"
+            stroke="var(--color-accent)"
+            strokeWidth={2}
+            strokeDasharray="2 10"
+            strokeLinecap="round"
+            vectorEffect="non-scaling-stroke"
+          />
+        </svg>
+
+        <motion.div
+          className="grid-4col"
+          style={{ alignItems: "start", position: "relative", zIndex: 1 }}
+          initial={reduce ? false : "hidden"}
+          whileInView={reduce ? undefined : "show"}
+          viewport={{ once: true, amount: 0.2 }}
+          variants={reduce ? undefined : { show: { transition: { staggerChildren: 0.15 } } }}
+        >
+          {STEPS.map(({ num, titleKey, descKey, offset }, i) => {
           const isTeal = !offset
+          const rot = offset ? -2.5 : 2.5
+          const shift = offset ? -10 : 10
+          const cardVariants = {
+            hidden: { opacity: 0, y: 60, rotate: rot, x: shift },
+            show:   { opacity: 1, y: 0, rotate: rot, x: shift, transition: { duration: 0.6, ease: EASE } },
+          }
           return (
-            <div
+            <motion.div
               key={i}
+              className="journey-tilt"
+              variants={reduce ? undefined : cardVariants}
               style={{
                 borderRadius: 28,
-                padding: "28px 24px 36px",
+                padding: "clamp(18px,3.5vw,28px) clamp(14px,3vw,24px) clamp(22px,5vw,36px)",
                 background: isTeal
                   ? "var(--color-accent)"
                   : "var(--color-brand)",
-                marginTop: offset ? 56 : 0,
                 display: "flex",
                 flexDirection: "column",
-                transform: `rotate(${offset ? -2.5 : 2.5}deg)`,
+                transform: reduce ? `rotate(${rot}deg) translateX(${shift}px)` : undefined,
               }}
             >
               <div
@@ -95,15 +125,15 @@ export function CareJourneySection() {
               >
                 <span
                   style={{
-                    width: 50,
-                    height: 50,
+                    width: "clamp(40px,8vw,50px)",
+                    height: "clamp(40px,8vw,50px)",
                     borderRadius: "50%",
                     display: "grid",
                     placeItems: "center",
                     background: isTeal
                       ? "var(--color-brand)"
                       : "var(--color-surface)",
-                    fontSize: 15,
+                    fontSize: "clamp(13px,2.5vw,15px)",
                     fontWeight: 700,
                     color: isTeal ? "#fff" : "var(--color-brand)",
                   }}
@@ -115,7 +145,7 @@ export function CareJourneySection() {
                 style={{
                   fontFamily: "var(--font-sans), sans-serif",
                   fontWeight: 800,
-                  fontSize: 26,
+                  fontSize: "clamp(19px,4vw,26px)",
                   lineHeight: 1.15,
                   letterSpacing: "-0.01em",
                   color: isTeal ? "var(--color-text)" : "var(--color-surface)",
@@ -126,7 +156,7 @@ export function CareJourneySection() {
               </h3>
               <p
                 style={{
-                  fontSize: 15.5,
+                  fontSize: "clamp(14px,3vw,15.5px)",
                   lineHeight: 1.6,
                   color: isTeal ? "var(--color-text)" : "var(--color-surface)",
                   margin: 0,
@@ -134,9 +164,10 @@ export function CareJourneySection() {
               >
                 {t[descKey]}
               </p>
-            </div>
+            </motion.div>
           )
         })}
+        </motion.div>
       </div>
     </section>
   )

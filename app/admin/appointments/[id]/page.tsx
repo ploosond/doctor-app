@@ -50,7 +50,7 @@ export default async function AppointmentDetailPage({
   return (
     <div style={{ padding: "36px 40px" }}>
       {/* Breadcrumb */}
-      <div style={{ fontSize: 13, color: "var(--color-text-muted)", marginBottom: 20 }}>
+      <div style={{ fontSize: 15, color: "var(--color-text-muted)", marginBottom: 20 }}>
         <Link href="/admin/appointments" style={{ color: "var(--color-text-muted)", textDecoration: "none" }}>
           Appointments
         </Link>
@@ -85,7 +85,7 @@ export default async function AppointmentDetailPage({
             style={{
               fontFamily: "var(--font-sans), sans-serif",
               fontWeight: 700,
-              fontSize: 15,
+              fontSize: 17,
               color: "var(--color-text)",
               margin: "0 0 20px",
             }}
@@ -110,7 +110,7 @@ export default async function AppointmentDetailPage({
                 gap: 12,
                 padding: "10px 0",
                 borderBottom: "1px solid rgba(23,42,58,0.07)",
-                fontSize: 14,
+                fontSize: 16,
               }}
             >
               <span style={{ color: "var(--color-text-muted)", fontWeight: 500 }}>{label}</span>
@@ -136,7 +136,7 @@ export default async function AppointmentDetailPage({
                     borderRadius: 8,
                     background: "var(--color-brand)",
                     color: "#fff",
-                    fontSize: 13,
+                    fontSize: 15,
                     fontWeight: 600,
                     border: "none",
                     cursor: "pointer",
@@ -160,7 +160,7 @@ export default async function AppointmentDetailPage({
                     borderRadius: 8,
                     background: "var(--color-brand)",
                     color: "#fff",
-                    fontSize: 13,
+                    fontSize: 15,
                     fontWeight: 600,
                     border: "none",
                     cursor: "pointer",
@@ -184,7 +184,7 @@ export default async function AppointmentDetailPage({
                     borderRadius: 8,
                     background: "rgba(192,57,43,0.1)",
                     color: "#c0392b",
-                    fontSize: 13,
+                    fontSize: 15,
                     fontWeight: 600,
                     border: "none",
                     cursor: "pointer",
@@ -200,7 +200,7 @@ export default async function AppointmentDetailPage({
           <div style={{ marginTop: 24 }}>
             <div
               style={{
-                fontSize: 13,
+                fontSize: 14,
                 fontWeight: 600,
                 color: "var(--color-text-muted)",
                 marginBottom: 8,
@@ -222,10 +222,10 @@ export default async function AppointmentDetailPage({
                 rows={4}
                 style={{
                   width: "100%",
-                  padding: "10px 12px",
+                  padding: "12px 14px",
                   borderRadius: 8,
                   border: "1.5px solid var(--color-accent)",
-                  fontSize: 14,
+                  fontSize: 16,
                   color: "var(--color-text)",
                   resize: "vertical",
                   boxSizing: "border-box",
@@ -236,11 +236,11 @@ export default async function AppointmentDetailPage({
                 type="submit"
                 style={{
                   marginTop: 8,
-                  padding: "7px 16px",
+                  padding: "9px 18px",
                   borderRadius: 7,
                   background: "var(--color-surface)",
                   color: "var(--color-brand)",
-                  fontSize: 13,
+                  fontSize: 15,
                   fontWeight: 600,
                   border: "1.5px solid var(--color-brand)",
                   cursor: "pointer",
@@ -283,7 +283,7 @@ export default async function AppointmentDetailPage({
             <Link
               href={`/admin/patients/${patient?._id}`}
               style={{
-                fontSize: 13,
+                fontSize: 15,
                 color: "var(--color-brand)",
                 textDecoration: "none",
                 fontWeight: 600,
@@ -316,7 +316,7 @@ export default async function AppointmentDetailPage({
               </div>
             ))
           ) : (
-            <p style={{ color: "var(--color-text-muted)", fontSize: 14 }}>Patient not found.</p>
+            <p style={{ color: "var(--color-text-muted)", fontSize: 16 }}>Patient not found.</p>
           )}
         </div>
       </div>

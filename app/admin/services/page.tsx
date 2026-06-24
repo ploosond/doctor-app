@@ -1,6 +1,8 @@
 import Link from "next/link"
 import { connectDB } from "@/lib/db"
 import { ServiceModel } from "@/models/service"
+import { deleteService } from "./actions"
+import { DeleteButton } from "./DeleteButton"
 
 function formatDate(d: Date) {
   return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
@@ -28,11 +30,11 @@ export default async function ServicesAdminPage() {
         <Link
           href="/admin/services/new"
           style={{
-            padding: "9px 20px",
+            padding: "11px 22px",
             borderRadius: 10,
             background: "var(--color-brand)",
             color: "#fff",
-            fontSize: 13,
+            fontSize: 15,
             fontWeight: 600,
             textDecoration: "none",
           }}
@@ -47,7 +49,7 @@ export default async function ServicesAdminPage() {
             padding: "60px",
             textAlign: "center",
             color: "var(--color-text-muted)",
-            fontSize: 14,
+            fontSize: 16,
             background: "var(--color-surface)",
             borderRadius: 12,
           }}
@@ -62,7 +64,7 @@ export default async function ServicesAdminPage() {
           style={{
             width: "100%",
             borderCollapse: "collapse",
-            fontSize: 14,
+            fontSize: 16,
             color: "var(--color-text)",
             background: "#fff",
             borderRadius: 14,
@@ -75,14 +77,14 @@ export default async function ServicesAdminPage() {
               style={{
                 background: "var(--color-surface)",
                 color: "var(--color-text-muted)",
-                fontSize: 11,
+                fontSize: 13,
                 fontWeight: 700,
                 textTransform: "uppercase",
                 letterSpacing: "0.05em",
               }}
             >
-              {["Service (EN)", "Slug", "Tag", "Visible", "Created", ""].map((h) => (
-                <th key={h} style={{ textAlign: "left", padding: "11px 16px", fontWeight: 700 }}>
+              {["Service (EN)", "Slug", "Tag", "Visible", "Created", "Actions"].map((h) => (
+                <th key={h} style={{ textAlign: "left", padding: "13px 18px", fontWeight: 700 }}>
                   {h}
                 </th>
               ))}
@@ -91,31 +93,38 @@ export default async function ServicesAdminPage() {
           <tbody>
             {services.map((svc) => (
               <tr key={String(svc._id)} style={{ borderBottom: "1px solid rgba(23,42,58,0.06)" }}>
-                <td style={{ padding: "12px 16px", fontWeight: 600 }}>
+                <td style={{ padding: "14px 18px", fontWeight: 600 }}>
                   {(svc.content as { en: { name: string } }).en?.name ?? "—"}
                 </td>
-                <td style={{ padding: "12px 16px", color: "var(--color-text-muted)", fontFamily: "monospace", fontSize: 13 }}>
+                <td style={{ padding: "14px 18px", color: "var(--color-text-muted)", fontFamily: "monospace", fontSize: 15 }}>
                   {svc.slug}
                 </td>
-                <td style={{ padding: "12px 16px", color: "var(--color-text-muted)" }}>
+                <td style={{ padding: "14px 18px", color: "var(--color-text-muted)" }}>
                   {(svc.content as { en: { tag: string } }).en?.tag ?? "—"}
                 </td>
-                <td style={{ padding: "12px 16px" }}>
+                <td style={{ padding: "14px 18px" }}>
                   <span style={{ color: svc.visible ? "var(--color-brand)" : "var(--color-text-muted)", fontWeight: 700 }}>
                     {svc.visible ? "✓" : "–"}
                   </span>
                 </td>
-                <td style={{ padding: "12px 16px", color: "var(--color-text-muted)" }}>
+                <td style={{ padding: "14px 18px", color: "var(--color-text-muted)" }}>
                   {formatDate(svc.createdAt as Date)}
                 </td>
-                <td style={{ padding: "12px 16px" }}>
+                <td style={{ padding: "14px 18px", whiteSpace: "nowrap" }}>
                   <Link
                     href={`/services/${svc.slug}`}
                     target="_blank"
-                    style={{ fontSize: 12, color: "var(--color-text-muted)", textDecoration: "none", marginRight: 12 }}
+                    style={{ fontSize: 14, color: "var(--color-text-muted)", textDecoration: "none", marginRight: 14 }}
                   >
                     Preview ↗
                   </Link>
+                  <Link
+                    href={`/admin/services/${svc.slug}`}
+                    style={{ fontSize: 14, color: "var(--color-brand)", textDecoration: "none", fontWeight: 600, marginRight: 14 }}
+                  >
+                    Edit
+                  </Link>
+                  <DeleteButton action={deleteService.bind(null, svc.slug)} />
                 </td>
               </tr>
             ))}

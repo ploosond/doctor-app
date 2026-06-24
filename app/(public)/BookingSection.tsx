@@ -7,8 +7,8 @@ export function BookingSection() {
   const { t } = useLang();
 
   return (
-    <section id="booking" style={{ padding: "58px 28px" }}>
-      <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+    <section id="booking" style={{ padding: "clamp(30px,8vw,58px) 0" }}>
+      <div className="section-container">
         <div style={{ marginBottom: 36 }}>
           <h2
             style={{
@@ -45,15 +45,15 @@ export function BookingSection() {
             background:
               "radial-gradient(58% 52% at 100% 0%, rgba(116,179,206,.35), transparent 55%), var(--color-surface)",
             border: "1px solid var(--color-accent)",
-            padding: "80px 40px",
+            padding: "clamp(40px,8vw,80px) clamp(20px,5vw,40px)",
             textAlign: "center",
             boxShadow: "0 40px 90px -40px rgba(23,42,58,0.2)",
           }}
         >
           <div
             style={{
-              width: 72,
-              height: 72,
+              width: "clamp(52px,10vw,72px)",
+              height: "clamp(52px,10vw,72px)",
               borderRadius: "50%",
               background: "var(--color-brand)",
               display: "grid",
@@ -66,7 +66,7 @@ export function BookingSection() {
           <h3
             style={{
               fontFamily: "var(--font-heading), serif",
-              fontSize: 28,
+              fontSize: "clamp(20px,4.5vw,28px)",
               fontWeight: 500,
               color: "var(--color-text)",
               margin: "0 0 12px",
@@ -78,7 +78,7 @@ export function BookingSection() {
             style={{
               fontSize: 16,
               color: "var(--color-text-muted)",
-              maxWidth: 420,
+              maxWidth: "clamp(260px,90%,420px)",
               margin: "0 auto 28px",
               lineHeight: 1.6,
             }}

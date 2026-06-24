@@ -82,9 +82,9 @@ export default async function AppointmentsPage({
             key={val}
             href={val ? `/admin/appointments?status=${val}` : "/admin/appointments"}
             style={{
-              padding: "6px 14px",
+              padding: "8px 16px",
               borderRadius: 999,
-              fontSize: 13,
+              fontSize: 15,
               fontWeight: 600,
               textDecoration: "none",
               border: "1.5px solid",
@@ -104,7 +104,7 @@ export default async function AppointmentsPage({
             padding: "60px",
             textAlign: "center",
             color: "var(--color-text-muted)",
-            fontSize: 14,
+            fontSize: 16,
             background: "var(--color-surface)",
             borderRadius: 12,
           }}
@@ -116,7 +116,7 @@ export default async function AppointmentsPage({
           style={{
             width: "100%",
             borderCollapse: "collapse",
-            fontSize: 14,
+            fontSize: 16,
             color: "var(--color-text)",
             background: "#fff",
             borderRadius: 14,
@@ -129,14 +129,14 @@ export default async function AppointmentsPage({
               style={{
                 background: "var(--color-surface)",
                 color: "var(--color-text-muted)",
-                fontSize: 12,
+                fontSize: 14,
                 fontWeight: 600,
                 textTransform: "uppercase",
                 letterSpacing: "0.04em",
               }}
             >
               {["Patient", "Service", "Mode", "Date / Time", "Status", "Actions"].map((h) => (
-                <th key={h} style={{ textAlign: "left", padding: "12px 16px", fontWeight: 600 }}>
+                <th key={h} style={{ textAlign: "left", padding: "14px 18px", fontWeight: 600 }}>
                   {h}
                 </th>
               ))}
@@ -148,24 +148,24 @@ export default async function AppointmentsPage({
               const apptId = String(appt._id)
               return (
                 <tr key={apptId} style={{ borderBottom: "1px solid rgba(23,42,58,0.06)" }}>
-                  <td style={{ padding: "12px 16px" }}>
+                  <td style={{ padding: "14px 18px" }}>
                     <div style={{ fontWeight: 600 }}>{patient?.name ?? "—"}</div>
-                    <div style={{ fontSize: 12, color: "var(--color-text-muted)" }}>{patient?.phone}</div>
+                    <div style={{ fontSize: 14, color: "var(--color-text-muted)" }}>{patient?.phone}</div>
                   </td>
-                  <td style={{ padding: "12px 16px", textTransform: "capitalize" }}>{appt.service}</td>
-                  <td style={{ padding: "12px 16px", textTransform: "capitalize" }}>
+                  <td style={{ padding: "14px 18px", textTransform: "capitalize" }}>{appt.service}</td>
+                  <td style={{ padding: "14px 18px", textTransform: "capitalize" }}>
                     {(appt.mode as string).replace("_", " ")}
                   </td>
-                  <td style={{ padding: "12px 16px", color: "var(--color-text-muted)" }}>
+                  <td style={{ padding: "14px 18px", color: "var(--color-text-muted)" }}>
                     {formatDate(appt.slotStart as Date)}
                   </td>
-                  <td style={{ padding: "12px 16px" }}>
+                  <td style={{ padding: "14px 18px" }}>
                     <span
                       style={{
                         display: "inline-block",
-                        padding: "3px 10px",
+                        padding: "5px 12px",
                         borderRadius: 999,
-                        fontSize: 12,
+                        fontSize: 14,
                         fontWeight: 600,
                         background: `${STATUS_COLOR[appt.status as string]}18`,
                         color: STATUS_COLOR[appt.status as string],
@@ -174,7 +174,7 @@ export default async function AppointmentsPage({
                       {STATUS_LABEL[appt.status as string] ?? appt.status}
                     </span>
                   </td>
-                  <td style={{ padding: "12px 16px" }}>
+                  <td style={{ padding: "14px 18px" }}>
                     <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                       {appt.status === "requested" && (
                         <form
@@ -186,11 +186,11 @@ export default async function AppointmentsPage({
                           <button
                             type="submit"
                             style={{
-                              padding: "5px 12px",
+                              padding: "7px 14px",
                               borderRadius: 7,
                               background: "var(--color-brand)",
                               color: "#fff",
-                              fontSize: 12,
+                              fontSize: 14,
                               fontWeight: 600,
                               border: "none",
                               cursor: "pointer",
@@ -210,11 +210,11 @@ export default async function AppointmentsPage({
                           <button
                             type="submit"
                             style={{
-                              padding: "5px 12px",
+                              padding: "7px 14px",
                               borderRadius: 7,
                               background: "rgba(192,57,43,0.1)",
                               color: "#c0392b",
-                              fontSize: 12,
+                              fontSize: 14,
                               fontWeight: 600,
                               border: "none",
                               cursor: "pointer",
@@ -227,11 +227,11 @@ export default async function AppointmentsPage({
                       <Link
                         href={`/admin/appointments/${apptId}`}
                         style={{
-                          padding: "5px 12px",
+                          padding: "7px 14px",
                           borderRadius: 7,
                           background: "var(--color-surface)",
                           color: "var(--color-text-muted)",
-                          fontSize: 12,
+                          fontSize: 14,
                           fontWeight: 600,
                           textDecoration: "none",
                         }}

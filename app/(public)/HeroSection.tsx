@@ -36,11 +36,10 @@ export function HeroSection() {
   return (
     <section
       id="top"
+      className="hero-shell"
       style={{
         position: "relative",
         width: "100%",
-        height: "100vh",
-        minHeight: 600,
         overflow: "hidden",
       }}
     >
@@ -79,15 +78,14 @@ export function HeroSection() {
 
       {/* Text overlay */}
       <div
+        className="hero-text-panel"
         style={{
           position: "absolute",
           inset: 0,
           zIndex: 3,
           display: "flex",
           flexDirection: "column",
-          justifyContent: "center",
-          padding: "70px 60px",
-          maxWidth: "55%",
+          justifyContent: "flex-end",
         }}
       >
         <h1
@@ -108,10 +106,10 @@ export function HeroSection() {
         </h1>
         <p
           style={{
-            fontSize: 18,
+            fontSize: "clamp(15px,4vw,18px)",
             lineHeight: 1.6,
             color: "rgba(255,255,255,0.9)",
-            maxWidth: 480,
+            maxWidth: "clamp(280px,90vw,480px)",
             margin: "0 0 32px",
           }}
         >
@@ -135,8 +133,8 @@ export function HeroSection() {
               textDecoration: "none",
               color: "#fff",
               fontWeight: 600,
-              fontSize: 16,
-              padding: "6px 6px 6px 28px",
+              fontSize: "clamp(14px,3.5vw,16px)",
+              padding: "6px 6px 6px clamp(18px,4vw,28px)",
               borderRadius: 999,
               background: "var(--color-brand)",
             }}
@@ -167,8 +165,8 @@ export function HeroSection() {
               textDecoration: "none",
               color: "#fff",
               fontWeight: 600,
-              fontSize: 16,
-              padding: "6px 6px 6px 28px",
+              fontSize: "clamp(14px,3.5vw,16px)",
+              padding: "6px 6px 6px clamp(18px,4vw,28px)",
               borderRadius: 999,
               background: "rgba(255,255,255,0.15)",
               border: "1px solid rgba(255,255,255,0.25)",
@@ -196,6 +194,7 @@ export function HeroSection() {
 
       {/* Progress bar */}
       <div
+        className="hero-progress"
         style={{
           position: "absolute",
           right: 28,
@@ -244,8 +243,8 @@ export function HeroSection() {
             key={i}
             onClick={fn}
             style={{
-              width: 40,
-              height: 40,
+              width: "clamp(34px,8vw,40px)",
+              height: "clamp(34px,8vw,40px)",
               borderRadius: "50%",
               border: "1.5px solid rgba(255,255,255,0.3)",
               background: "rgba(255,255,255,0.1)",
