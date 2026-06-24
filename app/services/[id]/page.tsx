@@ -1,3 +1,5 @@
+export const revalidate = 3600 // ISR — regenerate hourly; first build can't reach private-VPC Mongo
+
 import { notFound } from "next/navigation"
 import type { Metadata } from "next"
 import { connectDB } from "@/lib/db"
@@ -6,10 +8,19 @@ import { ServiceDetailClient, type ServiceDoc } from "./ServiceDetailClient"
 
 type Props = { params: Promise<{ id: string }> }
 
+async function getService(slug: string): Promise<ServiceDoc | null> {
+  try {
+    await connectDB()
+    return await ServiceModel.findOne({ slug, visible: true }).lean() as ServiceDoc | null
+  } catch {
+    // build runs before Mongo is reachable — ISR fetches real data at runtime
+    return null
+  }
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params
-  await connectDB()
-  const svc = await ServiceModel.findOne({ slug: id, visible: true }).lean() as ServiceDoc | null
+  const svc = await getService(id)
   if (!svc) return {}
   const en = svc.content.en
   return {
@@ -26,8 +37,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ServicePage({ params }: Props) {
   const { id } = await params
-  await connectDB()
-  const svc = await ServiceModel.findOne({ slug: id, visible: true }).lean() as ServiceDoc | null
+  const svc = await getService(id)
   if (!svc) notFound()
   return <ServiceDetailClient svc={JSON.parse(JSON.stringify(svc))} />
 }

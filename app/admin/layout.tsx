@@ -1,7 +1,9 @@
+export const dynamic = "force-dynamic"
+
 import { redirect } from "next/navigation"
 import { headers } from "next/headers"
 import Link from "next/link"
-import { auth } from "@/lib/auth"
+import { getAuth } from "@/lib/auth"
 import { AdminSignOut } from "./AdminSignOut"
 
 const NAV = [
@@ -12,6 +14,7 @@ const NAV = [
 ]
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  const auth = await getAuth()
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session) redirect("/login")
 
