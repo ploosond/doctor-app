@@ -9,13 +9,14 @@ export function DeleteButton({ action }: { action: () => Promise<void> }) {
           if (!confirm("Delete this service? This cannot be undone.")) e.preventDefault()
         }}
         style={{
-          fontSize: 14,
+          padding: "7px 14px",
+          borderRadius: 7,
+          background: "rgba(192,57,43,0.1)",
           color: "#c0392b",
-          background: "none",
+          fontSize: 14,
+          fontWeight: 600,
           border: "none",
           cursor: "pointer",
-          padding: 0,
-          fontWeight: 600,
         }}
       >
         Delete

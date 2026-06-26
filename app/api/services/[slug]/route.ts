@@ -1,14 +1,12 @@
 import { NextResponse } from "next/server"
-import { connectDB } from "@/lib/db"
-import { ServiceModel } from "@/models/service"
+import { getServiceBySlug } from "@/lib/services/catalog"
 
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ slug: string }> }
 ) {
   const { slug } = await params
-  await connectDB()
-  const svc = await ServiceModel.findOne({ slug, visible: true }).lean()
+  const svc = await getServiceBySlug(slug, { visibleOnly: true })
   if (!svc) return NextResponse.json(null, { status: 404 })
   return NextResponse.json(svc)
 }

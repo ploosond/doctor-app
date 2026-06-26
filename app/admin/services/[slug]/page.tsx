@@ -1,14 +1,12 @@
 import { notFound } from "next/navigation"
 import Link from "next/link"
-import { connectDB } from "@/lib/db"
-import { ServiceModel } from "@/models/service"
-import { ServiceForm } from "../new/ServiceForm"
+import { getServiceBySlug } from "@/lib/services/catalog"
+import { ServiceForm } from "../components/ServiceForm"
 import { updateService } from "../actions"
 
 export default async function EditServicePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  await connectDB()
-  const svc = await ServiceModel.findOne({ slug }).lean()
+  const svc = await getServiceBySlug(slug)
   if (!svc) notFound()
 
   const action = updateService.bind(null, slug)

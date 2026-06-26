@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { useLang } from "@/lib/i18n"
 import { Logo } from "@/components/Logo"
 
@@ -96,10 +97,10 @@ export function Footer() {
               Legal
             </div>
             <nav style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {[t.privacy, t.terms].map((label) => (
-                <a
-                  key={label}
-                  href='#'
+              {[[t.privacy, "/privacy"], [t.terms, "/terms"]].map(([label, href]) => (
+                <Link
+                  key={href}
+                  href={href}
                   style={{
                     textDecoration: "none",
                     color: "var(--color-text-muted)",
@@ -117,7 +118,7 @@ export function Footer() {
                   }
                 >
                   {label}
-                </a>
+                </Link>
               ))}
             </nav>
           </div>

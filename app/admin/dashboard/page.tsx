@@ -1,6 +1,5 @@
-import { connectDB } from "@/lib/db"
-import { AppointmentModel } from "@/models/appointment"
-import { PatientModel } from "@/models/patient"
+import { appointmentStats, recentAppointments as getRecentAppointments } from "@/lib/services/appointments"
+import { countActivePatients } from "@/lib/services/patients"
 import Link from "next/link"
 
 const STATUS_LABEL: Record<string, string> = {
@@ -30,31 +29,17 @@ function formatDate(d: Date) {
 }
 
 export default async function DashboardPage() {
-  await connectDB()
-
-  const now = new Date()
-  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-  const weekStart = new Date(todayStart)
-  weekStart.setDate(weekStart.getDate() - weekStart.getDay())
-
-  const [todayCount, pendingCount, totalPatients, weekCount, recentAppointments] =
-    await Promise.all([
-      AppointmentModel.countDocuments({ slotStart: { $gte: todayStart } }),
-      AppointmentModel.countDocuments({ status: "requested" }),
-      PatientModel.countDocuments({ deletedAt: null }),
-      AppointmentModel.countDocuments({ slotStart: { $gte: weekStart } }),
-      AppointmentModel.find()
-        .sort({ createdAt: -1 })
-        .limit(5)
-        .populate("patientRef", "name phone")
-        .lean(),
-    ])
+  const [counts, totalPatients, recentAppointments] = await Promise.all([
+    appointmentStats(),
+    countActivePatients(),
+    getRecentAppointments(5),
+  ])
 
   const stats = [
-    { label: "Today's appointments", value: todayCount },
-    { label: "Pending confirmation", value: pendingCount },
+    { label: "Today's appointments", value: counts.today },
+    { label: "Pending confirmation", value: counts.pending },
     { label: "Total patients", value: totalPatients },
-    { label: "This week", value: weekCount },
+    { label: "This week", value: counts.week },
   ]
 
   return (

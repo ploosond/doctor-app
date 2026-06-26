@@ -1,11 +1,9 @@
 import mongoose, { Schema, model, models, type InferSchemaType } from "mongoose"
 
-const SERVICE_SLUGS = ["consult", "anxiety", "meds", "assess", "therapy", "wellness"] as const
-
 const appointmentSchema = new Schema(
   {
     patientRef: { type: Schema.Types.ObjectId, ref: "Patient", required: true },
-    service: { type: String, enum: SERVICE_SLUGS, required: true },
+    service: { type: String, required: true }, // service slug (DB-driven via ServiceModel)
     mode: { type: String, enum: ["in_person", "video"], default: "in_person" },
     slotStart: { type: Date, required: true },
     slotEnd: { type: Date, required: true },
@@ -14,12 +12,6 @@ const appointmentSchema = new Schema(
       enum: ["requested", "confirmed", "completed", "cancelled", "no_show"],
       default: "requested",
     },
-    paymentStatus: {
-      type: String,
-      enum: ["unpaid", "paid", "refunded"],
-      default: "unpaid",
-    },
-    fee: { type: Number },
     notes: { type: String }, // admin-only
   },
   { timestamps: true }

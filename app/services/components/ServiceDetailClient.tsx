@@ -3,8 +3,8 @@
 import Link from "next/link"
 import { ArrowLeft, ArrowRight, Check } from "lucide-react"
 import { useLang } from "@/lib/i18n"
-import { Nav } from "@/app/(public)/Nav"
-import { Footer } from "@/app/(public)/Footer"
+import { Nav } from "@/app/(public)/components/Nav"
+import { Footer } from "@/app/(public)/components/Footer"
 
 interface Step { title: string; desc: string }
 interface LocaleContent {

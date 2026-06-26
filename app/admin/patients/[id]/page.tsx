@@ -1,34 +1,45 @@
 import { notFound } from "next/navigation"
 import Link from "next/link"
-import { connectDB } from "@/lib/db"
-import { PatientModel } from "@/models/patient"
-import { AppointmentModel } from "@/models/appointment"
-import { updatePatientNotes } from "../actions"
-
-const STATUS_LABEL: Record<string, string> = {
-  requested: "Pending",
-  confirmed: "Confirmed",
-  completed: "Completed",
-  cancelled: "Cancelled",
-  no_show: "No-show",
-}
-
-const STATUS_COLOR: Record<string, string> = {
-  requested: "#508991",
-  confirmed: "#004346",
-  completed: "#74B3CE",
-  cancelled: "#c0392b",
-  no_show: "#c0392b",
-}
+import { getPatient, listVisitsByPatient } from "@/lib/services/patients"
+import { updatePatientNotes, deletePatient, addVisit, updateVisit, deleteVisit } from "../actions"
+import { VisitForm, DeleteVisitButton } from "../components/VisitForm"
+import { DeletePatientButton } from "../components/DeletePatientButton"
 
 function formatDate(d: Date) {
   return new Date(d).toLocaleDateString("en-GB", {
     day: "numeric",
     month: "short",
     year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
   })
+}
+
+function toDateInput(d?: Date | null): string | undefined {
+  if (!d) return undefined
+  return new Date(d).toISOString().slice(0, 10)
+}
+
+function ageFrom(dob?: Date | null): string {
+  if (!dob) return "—"
+  const d = new Date(dob)
+  const diff = Date.now() - d.getTime()
+  const age = Math.floor(diff / (365.25 * 24 * 60 * 60 * 1000))
+  return `${age} yrs`
+}
+
+const cardStyle = {
+  background: "#fff",
+  borderRadius: 16,
+  padding: "24px",
+  boxShadow: "0 2px 8px rgba(23,42,58,0.06)",
+}
+
+const sectionHead = {
+  fontFamily: "var(--font-sans), sans-serif",
+  fontWeight: 700,
+  fontSize: 13,
+  color: "var(--color-text)",
+  textTransform: "uppercase" as const,
+  letterSpacing: "0.04em",
 }
 
 export default async function PatientDetailPage({
@@ -37,16 +48,15 @@ export default async function PatientDetailPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  await connectDB()
 
-  const patient = await PatientModel.findById(id).lean()
+  const patient = await getPatient(id)
   if (!patient) notFound()
 
-  const appointments = await AppointmentModel.find({ patientRef: patient._id })
-    .sort({ slotStart: -1 })
-    .lean()
+  const visits = await listVisitsByPatient(String(patient._id))
 
   const patientId = String(patient._id)
+  const lastVisit = visits[0]
+  const nextFollowUp = visits.find((v) => v.followUpDate)?.followUpDate
 
   return (
     <div style={{ padding: "36px 40px" }}>
@@ -59,57 +69,114 @@ export default async function PatientDetailPage({
         {patient.name}
       </div>
 
-      <h1
+      <div
         style={{
-          fontFamily: "var(--font-heading), serif",
-          fontWeight: 500,
-          fontSize: 26,
-          letterSpacing: "-0.01em",
-          color: "var(--color-text)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 16,
           margin: "0 0 28px",
         }}
       >
-        {patient.name}
-      </h1>
-
-      <div style={{ display: "grid", gridTemplateColumns: "340px 1fr", gap: 24 }}>
-        {/* Demographics */}
-        <div>
-          <div
+        <h1
+          style={{
+            fontFamily: "var(--font-heading), serif",
+            fontWeight: 500,
+            fontSize: 26,
+            letterSpacing: "-0.01em",
+            color: "var(--color-text)",
+            margin: 0,
+          }}
+        >
+          {patient.name}
+        </h1>
+        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+          <Link
+            href={`/admin/appointments/new?patient=${patientId}`}
             style={{
-              background: "#fff",
-              borderRadius: 16,
-              padding: "24px",
-              boxShadow: "0 2px 8px rgba(23,42,58,0.06)",
-              marginBottom: 16,
+              padding: "8px 16px",
+              borderRadius: 8,
+              background: "var(--color-brand)",
+              color: "#fff",
+              fontSize: 15,
+              fontWeight: 600,
+              textDecoration: "none",
             }}
           >
-            <h2
+            Book appointment
+          </Link>
+          <Link
+            href={`/admin/patients/${patientId}/edit`}
+            style={{
+              padding: "8px 16px",
+              borderRadius: 8,
+              background: "var(--color-surface)",
+              color: "var(--color-brand)",
+              fontSize: 15,
+              fontWeight: 600,
+              textDecoration: "none",
+            }}
+          >
+            Edit
+          </Link>
+          <DeletePatientButton action={deletePatient.bind(null, patientId)} />
+        </div>
+      </div>
+
+      {/* Alerts banner */}
+      {patient.alerts && (
+        <div
+          style={{
+            background: "rgba(192,57,43,0.06)",
+            border: "1.5px solid rgba(192,57,43,0.25)",
+            borderRadius: 12,
+            padding: "14px 18px",
+            marginBottom: 24,
+            display: "flex",
+            gap: 10,
+            alignItems: "flex-start",
+          }}
+        >
+          <span style={{ color: "#c0392b", fontSize: 18, lineHeight: 1.2 }}>⚠</span>
+          <div>
+            <div
               style={{
-                fontFamily: "var(--font-sans), sans-serif",
+                fontSize: 12,
                 fontWeight: 700,
-                fontSize: 16,
-                color: "var(--color-text)",
-                margin: "0 0 16px",
+                color: "#c0392b",
                 textTransform: "uppercase",
                 letterSpacing: "0.04em",
+                marginBottom: 3,
               }}
             >
-              Profile
-            </h2>
+              Alerts
+            </div>
+            <div style={{ fontSize: 16, color: "var(--color-text)", whiteSpace: "pre-wrap" }}>
+              {patient.alerts as string}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div style={{ display: "grid", gridTemplateColumns: "340px 1fr", gap: 24 }}>
+        {/* Left column */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          {/* Profile */}
+          <div style={cardStyle}>
+            <h2 style={{ ...sectionHead, margin: "0 0 16px" }}>Profile</h2>
             {[
               ["Phone", patient.phone],
               ["Email", patient.email ?? "—"],
+              ["Age", ageFrom(patient.dateOfBirth as Date | undefined)],
               ["Gender", patient.gender ?? "—"],
+              ["Occupation", patient.occupation ?? "—"],
+              ["Address", patient.address ?? "—"],
+              ["Emergency", patient.emergencyContactName
+                ? `${patient.emergencyContactName}${patient.emergencyContactPhone ? ` · ${patient.emergencyContactPhone}` : ""}`
+                : "—"],
+              ["Referral", patient.referralSource ?? "—"],
               ["Consent", patient.consentGiven ? "Given" : "Not given"],
-              [
-                "Registered",
-                new Date(patient.createdAt as Date).toLocaleDateString("en-GB", {
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
-                }),
-              ],
+              ["Registered", formatDate(patient.createdAt as Date)],
             ].map(([label, value]) => (
               <div
                 key={label}
@@ -123,35 +190,45 @@ export default async function PatientDetailPage({
                 }}
               >
                 <span style={{ color: "var(--color-text-muted)", fontWeight: 500 }}>{label}</span>
-                <span style={{ color: "var(--color-text)", fontWeight: 600, textTransform: "capitalize" }}>
+                <span style={{ color: "var(--color-text)", fontWeight: 600, textAlign: "right", textTransform: "capitalize" }}>
                   {value as string}
                 </span>
               </div>
             ))}
           </div>
 
-          {/* Notes */}
-          <div
-            style={{
-              background: "#fff",
-              borderRadius: 16,
-              padding: "24px",
-              boxShadow: "0 2px 8px rgba(23,42,58,0.06)",
-            }}
-          >
-            <h2
-              style={{
-                fontFamily: "var(--font-sans), sans-serif",
-                fontWeight: 700,
-                fontSize: 16,
-                color: "var(--color-text)",
-                margin: "0 0 12px",
-                textTransform: "uppercase",
-                letterSpacing: "0.04em",
-              }}
-            >
-              Admin notes
-            </h2>
+          {/* Visit stats */}
+          <div style={cardStyle}>
+            <h2 style={{ ...sectionHead, margin: "0 0 16px" }}>Chart summary</h2>
+            {[
+              ["Total visits", String(visits.length)],
+              ["Last visit", lastVisit ? formatDate(lastVisit.visitDate as Date) : "—"],
+              ["Next follow-up", nextFollowUp ? formatDate(nextFollowUp as Date) : "—"],
+              ["Current diagnosis", (lastVisit?.diagnosis as string) ?? "—"],
+              ["Current medication", (lastVisit?.medication as string) ?? "—"],
+            ].map(([label, value]) => (
+              <div
+                key={label}
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  gap: 12,
+                  padding: "10px 0",
+                  borderBottom: "1px solid rgba(23,42,58,0.07)",
+                  fontSize: 16,
+                }}
+              >
+                <span style={{ color: "var(--color-text-muted)", fontWeight: 500 }}>{label}</span>
+                <span style={{ color: "var(--color-text)", fontWeight: 600, textAlign: "right" }}>
+                  {value}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          {/* Admin notes */}
+          <div style={cardStyle}>
+            <h2 style={{ ...sectionHead, margin: "0 0 12px" }}>Admin notes</h2>
             <form
               action={async (fd: FormData) => {
                 "use server"
@@ -194,94 +271,99 @@ export default async function PatientDetailPage({
           </div>
         </div>
 
-        {/* Appointment history */}
-        <div
-          style={{
-            background: "#fff",
-            borderRadius: 16,
-            padding: "24px",
-            boxShadow: "0 2px 8px rgba(23,42,58,0.06)",
-          }}
-        >
-          <h2
+        {/* Right column — visits timeline */}
+        <div style={cardStyle}>
+          <div
             style={{
-              fontFamily: "var(--font-sans), sans-serif",
-              fontWeight: 700,
-              fontSize: 14,
-              color: "var(--color-text)",
-              margin: "0 0 16px",
-              textTransform: "uppercase",
-              letterSpacing: "0.04em",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginBottom: 16,
             }}
           >
-            Appointment history ({appointments.length})
-          </h2>
+            <h2 style={{ ...sectionHead, margin: 0 }}>Visits ({visits.length})</h2>
+            <VisitForm action={addVisit.bind(null, patientId)} triggerLabel="+ Add visit" />
+          </div>
 
-          {appointments.length === 0 ? (
-            <p style={{ color: "var(--color-text-muted)", fontSize: 16 }}>No appointments yet.</p>
+          {visits.length === 0 ? (
+            <p style={{ color: "var(--color-text-muted)", fontSize: 16, margin: 0 }}>
+              No visits recorded yet.
+            </p>
           ) : (
-            <table
-              style={{ width: "100%", borderCollapse: "collapse", fontSize: 16, color: "var(--color-text)" }}
-            >
-              <thead>
-                <tr
-                  style={{
-                    color: "var(--color-text-muted)",
-                    fontSize: 14,
-                    fontWeight: 600,
-                    textTransform: "uppercase",
-                    letterSpacing: "0.04em",
-                  }}
-                >
-                  {["Service", "Date", "Status", ""].map((h) => (
-                    <th key={h} style={{ textAlign: "left", padding: "8px 12px", fontWeight: 600 }}>
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {appointments.map((appt) => (
-                  <tr
-                    key={String(appt._id)}
-                    style={{ borderBottom: "1px solid rgba(23,42,58,0.06)" }}
+            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              {visits.map((v) => {
+                const vid = String(v._id)
+                return (
+                  <div
+                    key={vid}
+                    style={{
+                      border: "1px solid rgba(23,42,58,0.1)",
+                      borderRadius: 12,
+                      padding: "16px 18px",
+                    }}
                   >
-                    <td style={{ padding: "12px", textTransform: "capitalize" }}>{appt.service}</td>
-                    <td style={{ padding: "12px", color: "var(--color-text-muted)" }}>
-                      {formatDate(appt.slotStart as Date)}
-                    </td>
-                    <td style={{ padding: "12px" }}>
-                      <span
-                        style={{
-                          display: "inline-block",
-                          padding: "4px 10px",
-                          borderRadius: 999,
-                          fontSize: 13,
-                          fontWeight: 600,
-                          background: `${STATUS_COLOR[appt.status as string]}18`,
-                          color: STATUS_COLOR[appt.status as string],
-                        }}
-                      >
-                        {STATUS_LABEL[appt.status as string] ?? appt.status}
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: 12,
+                        marginBottom: 10,
+                      }}
+                    >
+                      <span style={{ fontWeight: 700, fontSize: 16, color: "var(--color-text)" }}>
+                        {formatDate(v.visitDate as Date)}
                       </span>
-                    </td>
-                    <td style={{ padding: "12px" }}>
-                      <Link
-                        href={`/admin/appointments/${String(appt._id)}`}
-                        style={{
-                          fontSize: 14,
-                          color: "var(--color-brand)",
-                          textDecoration: "none",
-                          fontWeight: 600,
-                        }}
-                      >
-                        View →
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                        <VisitForm
+                          action={updateVisit.bind(null, vid, patientId)}
+                          triggerLabel="Edit"
+                          initialData={{
+                            visitDate: toDateInput(v.visitDate as Date),
+                            notes: (v.notes as string) ?? "",
+                            diagnosis: (v.diagnosis as string) ?? "",
+                            medication: (v.medication as string) ?? "",
+                            followUpDate: toDateInput(v.followUpDate as Date | undefined),
+                          }}
+                        />
+                        <DeleteVisitButton action={deleteVisit.bind(null, vid, patientId)} />
+                      </div>
+                    </div>
+
+                    {v.notes && (
+                      <p style={{ fontSize: 16, color: "var(--color-text)", margin: "0 0 10px", whiteSpace: "pre-wrap" }}>
+                        {v.notes as string}
+                      </p>
+                    )}
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "6px 20px", fontSize: 15 }}>
+                      {v.diagnosis && (
+                        <span style={{ color: "var(--color-text-muted)" }}>
+                          <strong style={{ color: "var(--color-text)" }}>Dx:</strong> {v.diagnosis as string}
+                        </span>
+                      )}
+                      {v.medication && (
+                        <span style={{ color: "var(--color-text-muted)" }}>
+                          <strong style={{ color: "var(--color-text)" }}>Rx:</strong> {v.medication as string}
+                        </span>
+                      )}
+                      {v.followUpDate && (
+                        <span style={{ color: "var(--color-text-muted)" }}>
+                          <strong style={{ color: "var(--color-text)" }}>Follow-up:</strong> {formatDate(v.followUpDate as Date)}
+                        </span>
+                      )}
+                      {v.appointmentRef && (
+                        <Link
+                          href={`/admin/appointments/${String(v.appointmentRef)}`}
+                          style={{ color: "var(--color-brand)", fontWeight: 600, textDecoration: "none" }}
+                        >
+                          From appointment →
+                        </Link>
+                      )}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
           )}
         </div>
       </div>

@@ -106,8 +106,8 @@ export function Nav() {
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
             {/* Desktop CTA + divider + lang */}
             <div className='nav-cta-wrap'>
-              <a
-                href='#booking'
+              <Link
+                href='/#booking'
                 className='btn-primary'
                 style={{
                   display: "inline-flex",
@@ -126,7 +126,7 @@ export function Nav() {
               >
                 <CalendarDays size={15} strokeWidth={2} />
                 {t.nav_book}
-              </a>
+              </Link>
 
               <span
                 style={{
@@ -271,10 +271,10 @@ export function Nav() {
               {t[key]}
             </a>
           ))}
-          <a href='#booking' className='nav-mobile-cta'>
+          <Link href='/#booking' className='nav-mobile-cta'>
             <CalendarDays size={16} strokeWidth={2} />
             {t.nav_book}
-          </a>
+          </Link>
         </div>
       )}
     </>

@@ -1,16 +1,14 @@
 import Link from "next/link"
-import { connectDB } from "@/lib/db"
-import { ServiceModel } from "@/models/service"
-import { deleteService } from "./actions"
-import { DeleteButton } from "./DeleteButton"
+import { listServices } from "@/lib/services/catalog"
+import { deleteService, toggleServiceVisibility } from "./actions"
+import { DeleteButton } from "./components/DeleteButton"
 
 function formatDate(d: Date) {
   return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
 }
 
 export default async function ServicesAdminPage() {
-  await connectDB()
-  const services = await ServiceModel.find().sort({ createdAt: -1 }).lean()
+  const services = await listServices()
 
   return (
     <div style={{ padding: "36px 40px" }}>
@@ -77,14 +75,14 @@ export default async function ServicesAdminPage() {
               style={{
                 background: "var(--color-surface)",
                 color: "var(--color-text-muted)",
-                fontSize: 13,
-                fontWeight: 700,
+                fontSize: 14,
+                fontWeight: 600,
                 textTransform: "uppercase",
-                letterSpacing: "0.05em",
+                letterSpacing: "0.04em",
               }}
             >
               {["Service (EN)", "Slug", "Tag", "Visible", "Created", "Actions"].map((h) => (
-                <th key={h} style={{ textAlign: "left", padding: "13px 18px", fontWeight: 700 }}>
+                <th key={h} style={{ textAlign: "left", padding: "14px 18px", fontWeight: 600 }}>
                   {h}
                 </th>
               ))}
@@ -103,9 +101,23 @@ export default async function ServicesAdminPage() {
                   {(svc.content as { en: { tag: string } }).en?.tag ?? "—"}
                 </td>
                 <td style={{ padding: "14px 18px" }}>
-                  <span style={{ color: svc.visible ? "var(--color-brand)" : "var(--color-text-muted)", fontWeight: 700 }}>
-                    {svc.visible ? "✓" : "–"}
-                  </span>
+                  <form action={toggleServiceVisibility.bind(null, svc.slug)} style={{ display: "inline" }}>
+                    <button
+                      type="submit"
+                      title={svc.visible ? "Visible — click to hide" : "Hidden — click to show"}
+                      style={{
+                        color: svc.visible ? "var(--color-brand)" : "var(--color-text-muted)",
+                        fontWeight: 700,
+                        fontSize: 16,
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        padding: 0,
+                      }}
+                    >
+                      {svc.visible ? "✓" : "–"}
+                    </button>
+                  </form>
                 </td>
                 <td style={{ padding: "14px 18px", color: "var(--color-text-muted)" }}>
                   {formatDate(svc.createdAt as Date)}
@@ -114,13 +126,31 @@ export default async function ServicesAdminPage() {
                   <Link
                     href={`/services/${svc.slug}`}
                     target="_blank"
-                    style={{ fontSize: 14, color: "var(--color-text-muted)", textDecoration: "none", marginRight: 14 }}
+                    style={{
+                      padding: "7px 14px",
+                      borderRadius: 7,
+                      background: "var(--color-surface)",
+                      color: "var(--color-text-muted)",
+                      fontSize: 14,
+                      fontWeight: 600,
+                      textDecoration: "none",
+                      marginRight: 8,
+                    }}
                   >
                     Preview ↗
                   </Link>
                   <Link
                     href={`/admin/services/${svc.slug}`}
-                    style={{ fontSize: 14, color: "var(--color-brand)", textDecoration: "none", fontWeight: 600, marginRight: 14 }}
+                    style={{
+                      padding: "7px 14px",
+                      borderRadius: 7,
+                      background: "var(--color-surface)",
+                      color: "var(--color-brand)",
+                      fontSize: 14,
+                      fontWeight: 600,
+                      textDecoration: "none",
+                      marginRight: 8,
+                    }}
                   >
                     Edit
                   </Link>

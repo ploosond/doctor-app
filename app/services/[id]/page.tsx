@@ -2,16 +2,14 @@ export const revalidate = 3600 // ISR — regenerate hourly; first build can't r
 
 import { notFound } from "next/navigation"
 import type { Metadata } from "next"
-import { connectDB } from "@/lib/db"
-import { ServiceModel } from "@/models/service"
-import { ServiceDetailClient, type ServiceDoc } from "./ServiceDetailClient"
+import { getServiceBySlug } from "@/lib/services/catalog"
+import { ServiceDetailClient, type ServiceDoc } from "../components/ServiceDetailClient"
 
 type Props = { params: Promise<{ id: string }> }
 
 async function getService(slug: string): Promise<ServiceDoc | null> {
   try {
-    await connectDB()
-    return await ServiceModel.findOne({ slug, visible: true }).lean() as ServiceDoc | null
+    return (await getServiceBySlug(slug, { visibleOnly: true })) as unknown as ServiceDoc | null
   } catch {
     // build runs before Mongo is reachable — ISR fetches real data at runtime
     return null

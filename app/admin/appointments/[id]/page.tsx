@@ -1,8 +1,18 @@
 import { notFound } from "next/navigation"
 import Link from "next/link"
-import { connectDB } from "@/lib/db"
-import { AppointmentModel } from "@/models/appointment"
-import { updateAppointmentStatus, updateAppointmentNotes } from "../actions"
+import { getAppointment, visitsForAppointment } from "@/lib/services/appointments"
+import { updateAppointmentStatus, updateAppointmentNotes, deleteAppointment } from "../actions"
+import { addVisit } from "@/app/admin/patients/actions"
+import { VisitForm } from "@/app/admin/patients/components/VisitForm"
+import { DeleteAppointmentButton } from "../components/DeleteAppointmentButton"
+
+function toDateInput(d: Date): string {
+  return new Date(d).toISOString().slice(0, 10)
+}
+
+function shortDate(d: Date) {
+  return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
+}
 
 const STATUS_LABEL: Record<string, string> = {
   requested: "Pending",
@@ -29,12 +39,8 @@ export default async function AppointmentDetailPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  await connectDB()
 
-  const appt = await AppointmentModel.findById(id)
-    .populate("patientRef", "name phone email gender dateOfBirth")
-    .lean()
-
+  const appt = await getAppointment(id)
   if (!appt) notFound()
 
   const patient = appt.patientRef as unknown as {
@@ -46,6 +52,9 @@ export default async function AppointmentDetailPage({
   }
 
   const apptId = String(appt._id)
+  const patientId = String(patient?._id ?? "")
+
+  const linkedVisits = await visitsForAppointment(apptId)
 
   return (
     <div style={{ padding: "36px 40px" }}>
@@ -58,18 +67,45 @@ export default async function AppointmentDetailPage({
         {patient?.name ?? "Appointment"}
       </div>
 
-      <h1
+      <div
         style={{
-          fontFamily: "var(--font-heading), serif",
-          fontWeight: 500,
-          fontSize: 26,
-          letterSpacing: "-0.01em",
-          color: "var(--color-text)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 16,
           margin: "0 0 28px",
         }}
       >
-        Appointment detail
-      </h1>
+        <h1
+          style={{
+            fontFamily: "var(--font-heading), serif",
+            fontWeight: 500,
+            fontSize: 26,
+            letterSpacing: "-0.01em",
+            color: "var(--color-text)",
+            margin: 0,
+          }}
+        >
+          Appointment detail
+        </h1>
+        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+          <Link
+            href={`/admin/appointments/${apptId}/edit`}
+            style={{
+              padding: "8px 16px",
+              borderRadius: 8,
+              background: "var(--color-surface)",
+              color: "var(--color-brand)",
+              fontSize: 15,
+              fontWeight: 600,
+              textDecoration: "none",
+            }}
+          >
+            Reschedule
+          </Link>
+          <DeleteAppointmentButton action={deleteAppointment.bind(null, apptId)} />
+        </div>
+      </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
         {/* Appointment info */}
@@ -77,7 +113,7 @@ export default async function AppointmentDetailPage({
           style={{
             background: "#fff",
             borderRadius: 16,
-            padding: "28px",
+            padding: "24px",
             boxShadow: "0 2px 8px rgba(23,42,58,0.06)",
           }}
         >
@@ -85,9 +121,11 @@ export default async function AppointmentDetailPage({
             style={{
               fontFamily: "var(--font-sans), sans-serif",
               fontWeight: 700,
-              fontSize: 17,
+              fontSize: 13,
               color: "var(--color-text)",
               margin: "0 0 20px",
+              textTransform: "uppercase",
+              letterSpacing: "0.04em",
             }}
           >
             Appointment
@@ -98,8 +136,6 @@ export default async function AppointmentDetailPage({
             ["Mode", (appt.mode as string).replace("_", " ")],
             ["Start", formatDate(appt.slotStart as Date)],
             ["End", formatDate(appt.slotEnd as Date)],
-            ["Fee", appt.fee ? `Rs. ${appt.fee}` : "—"],
-            ["Payment", appt.paymentStatus as string],
             ["Status", STATUS_LABEL[appt.status as string] ?? appt.status],
           ].map(([label, value]) => (
             <div
@@ -170,6 +206,30 @@ export default async function AppointmentDetailPage({
                 </button>
               </form>
             )}
+            {appt.status === "confirmed" && (
+              <form
+                action={async () => {
+                  "use server"
+                  await updateAppointmentStatus(apptId, "no_show")
+                }}
+              >
+                <button
+                  type="submit"
+                  style={{
+                    padding: "8px 18px",
+                    borderRadius: 8,
+                    background: "rgba(192,57,43,0.1)",
+                    color: "#c0392b",
+                    fontSize: 15,
+                    fontWeight: 600,
+                    border: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  Mark no-show
+                </button>
+              </form>
+            )}
             {(appt.status === "requested" || appt.status === "confirmed") && (
               <form
                 action={async () => {
@@ -198,18 +258,20 @@ export default async function AppointmentDetailPage({
 
           {/* Admin notes */}
           <div style={{ marginTop: 24 }}>
-            <div
+            <h2
               style={{
-                fontSize: 14,
-                fontWeight: 600,
-                color: "var(--color-text-muted)",
+                fontFamily: "var(--font-sans), sans-serif",
+                fontWeight: 700,
+                fontSize: 13,
+                color: "var(--color-text)",
                 marginBottom: 8,
+                marginTop: 0,
                 textTransform: "uppercase",
                 letterSpacing: "0.04em",
               }}
             >
               Admin notes
-            </div>
+            </h2>
             <form
               action={async (fd: FormData) => {
                 "use server"
@@ -257,7 +319,7 @@ export default async function AppointmentDetailPage({
           style={{
             background: "#fff",
             borderRadius: 16,
-            padding: "28px",
+            padding: "24px",
             boxShadow: "0 2px 8px rgba(23,42,58,0.06)",
           }}
         >
@@ -273,9 +335,11 @@ export default async function AppointmentDetailPage({
               style={{
                 fontFamily: "var(--font-sans), sans-serif",
                 fontWeight: 700,
-                fontSize: 15,
+                fontSize: 13,
                 color: "var(--color-text)",
                 margin: 0,
+                textTransform: "uppercase",
+                letterSpacing: "0.04em",
               }}
             >
               Patient
@@ -308,7 +372,7 @@ export default async function AppointmentDetailPage({
                   gap: 12,
                   padding: "10px 0",
                   borderBottom: "1px solid rgba(23,42,58,0.07)",
-                  fontSize: 14,
+                  fontSize: 16,
                 }}
               >
                 <span style={{ color: "var(--color-text-muted)", fontWeight: 500 }}>{label}</span>
@@ -320,6 +384,99 @@ export default async function AppointmentDetailPage({
           )}
         </div>
       </div>
+
+      {/* Clinical note (linked visit) */}
+      {patient && (
+        <div
+          style={{
+            background: "#fff",
+            borderRadius: 16,
+            padding: "24px",
+            boxShadow: "0 2px 8px rgba(23,42,58,0.06)",
+            marginTop: 24,
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginBottom: 16,
+            }}
+          >
+            <h2
+              style={{
+                fontFamily: "var(--font-sans), sans-serif",
+                fontWeight: 700,
+                fontSize: 13,
+                color: "var(--color-text)",
+                margin: 0,
+                textTransform: "uppercase",
+                letterSpacing: "0.04em",
+              }}
+            >
+              Clinical note ({linkedVisits.length})
+            </h2>
+            <VisitForm
+              action={addVisit.bind(null, patientId)}
+              triggerLabel="+ Add visit note"
+              hidden={{ appointmentRef: apptId }}
+              prefillDate={toDateInput(appt.slotStart as Date)}
+            />
+          </div>
+
+          {linkedVisits.length === 0 ? (
+            <p style={{ color: "var(--color-text-muted)", fontSize: 16, margin: 0 }}>
+              No visit note recorded for this appointment yet.
+            </p>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              {linkedVisits.map((v) => (
+                <div
+                  key={String(v._id)}
+                  style={{
+                    border: "1px solid rgba(23,42,58,0.1)",
+                    borderRadius: 12,
+                    padding: "16px 18px",
+                  }}
+                >
+                  <div style={{ fontWeight: 700, fontSize: 16, color: "var(--color-text)", marginBottom: 8 }}>
+                    {shortDate(v.visitDate as Date)}
+                  </div>
+                  {v.notes && (
+                    <p style={{ fontSize: 16, color: "var(--color-text)", margin: "0 0 10px", whiteSpace: "pre-wrap" }}>
+                      {v.notes as string}
+                    </p>
+                  )}
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "6px 20px", fontSize: 15 }}>
+                    {v.diagnosis && (
+                      <span style={{ color: "var(--color-text-muted)" }}>
+                        <strong style={{ color: "var(--color-text)" }}>Dx:</strong> {v.diagnosis as string}
+                      </span>
+                    )}
+                    {v.medication && (
+                      <span style={{ color: "var(--color-text-muted)" }}>
+                        <strong style={{ color: "var(--color-text)" }}>Rx:</strong> {v.medication as string}
+                      </span>
+                    )}
+                    {v.followUpDate && (
+                      <span style={{ color: "var(--color-text-muted)" }}>
+                        <strong style={{ color: "var(--color-text)" }}>Follow-up:</strong> {shortDate(v.followUpDate as Date)}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))}
+              <Link
+                href={`/admin/patients/${patientId}`}
+                style={{ fontSize: 14, color: "var(--color-brand)", fontWeight: 600, textDecoration: "none" }}
+              >
+                View full patient chart →
+              </Link>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }

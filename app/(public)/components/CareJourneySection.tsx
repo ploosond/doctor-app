@@ -85,7 +85,7 @@ export function CareJourneySection() {
 
         <motion.div
           className="grid-4col"
-          style={{ alignItems: "start", position: "relative", zIndex: 1 }}
+          style={{ alignItems: "stretch", position: "relative", zIndex: 1 }}
           initial={reduce ? false : "hidden"}
           whileInView={reduce ? undefined : "show"}
           viewport={{ once: true, amount: 0.2 }}
@@ -112,6 +112,7 @@ export function CareJourneySection() {
                   : "var(--color-brand)",
                 display: "flex",
                 flexDirection: "column",
+                height: "100%",
                 transform: reduce ? `rotate(${rot}deg) translateX(${shift}px)` : undefined,
               }}
             >

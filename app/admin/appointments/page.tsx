@@ -1,5 +1,4 @@
-import { connectDB } from "@/lib/db"
-import { AppointmentModel } from "@/models/appointment"
+import { listAppointments } from "@/lib/services/appointments"
 import Link from "next/link"
 import { updateAppointmentStatus } from "./actions"
 
@@ -35,15 +34,7 @@ export default async function AppointmentsPage({
   searchParams: Promise<{ status?: string }>
 }) {
   const { status } = await searchParams
-  await connectDB()
-
-  const filter: Record<string, unknown> = {}
-  if (status) filter.status = status
-
-  const appointments = await AppointmentModel.find(filter)
-    .sort({ slotStart: -1 })
-    .populate("patientRef", "name phone")
-    .lean()
+  const appointments = await listAppointments({ status })
 
   return (
     <div style={{ padding: "36px 40px" }}>
@@ -67,6 +58,20 @@ export default async function AppointmentsPage({
         >
           Appointments
         </h1>
+        <Link
+          href="/admin/appointments/new"
+          style={{
+            padding: "11px 22px",
+            borderRadius: 10,
+            background: "var(--color-brand)",
+            color: "#fff",
+            fontSize: 15,
+            fontWeight: 600,
+            textDecoration: "none",
+          }}
+        >
+          + New appointment
+        </Link>
       </div>
 
       {/* Status filter tabs */}
@@ -221,6 +226,30 @@ export default async function AppointmentsPage({
                             }}
                           >
                             Cancel
+                          </button>
+                        </form>
+                      )}
+                      {appt.status === "confirmed" && (
+                        <form
+                          action={async () => {
+                            "use server"
+                            await updateAppointmentStatus(apptId, "no_show")
+                          }}
+                        >
+                          <button
+                            type="submit"
+                            style={{
+                              padding: "7px 14px",
+                              borderRadius: 7,
+                              background: "rgba(192,57,43,0.1)",
+                              color: "#c0392b",
+                              fontSize: 14,
+                              fontWeight: 600,
+                              border: "none",
+                              cursor: "pointer",
+                            }}
+                          >
+                            No-show
                           </button>
                         </form>
                       )}

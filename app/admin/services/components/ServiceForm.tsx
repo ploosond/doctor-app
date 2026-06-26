@@ -236,6 +236,7 @@ export function ServiceForm({ action, initialData }: { action: (fd: FormData) =>
   )
   const [metaDesc, setMetaDesc] = useState(initialData?.metaDescription ?? "")
   const [preview, setPreview] = useState<string | null>(initialData?.image ?? null)
+  const [fileName, setFileName] = useState<string | null>(null)
 
   return (
     <form action={action} encType="multipart/form-data">
@@ -265,19 +266,44 @@ export function ServiceForm({ action, initialData }: { action: (fd: FormData) =>
             )}
           </div>
           <div style={{ flex: 1 }}>
-            <label style={labelStyle}>Upload image</label>
+            <div style={labelStyle}>Upload image</div>
             <input
+              id="service-image-upload"
               name="image"
               type="file"
               accept="image/*"
+              style={{ display: "none" }}
               onChange={(e) => {
                 const file = e.target.files?.[0]
-                if (file) setPreview(URL.createObjectURL(file))
+                if (file) {
+                  setPreview(URL.createObjectURL(file))
+                  setFileName(file.name)
+                }
               }}
-              style={{ fontSize: 15, color: "var(--color-text)" }}
             />
-            <p style={{ fontSize: 14, color: "var(--color-text-muted)", margin: "6px 0 0" }}>
-              Uploaded to Cloudinary. Recommended: 800×600 JPG/PNG, under 8MB.
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 6 }}>
+              <label
+                htmlFor="service-image-upload"
+                style={{
+                  display: "inline-block",
+                  padding: "9px 18px",
+                  borderRadius: 8,
+                  border: "1.5px solid var(--color-accent)",
+                  background: "var(--color-surface)",
+                  color: "var(--color-brand)",
+                  fontSize: 15,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                }}
+              >
+                Choose image
+              </label>
+              <span style={{ fontSize: 14, color: "var(--color-text-muted)" }}>
+                {fileName ?? (preview ? "Current image" : "No file chosen")}
+              </span>
+            </div>
+            <p style={{ fontSize: 14, color: "var(--color-text-muted)", margin: 0 }}>
+              Recommended: 800×600 JPG/PNG, under 8MB.
             </p>
           </div>
         </div>

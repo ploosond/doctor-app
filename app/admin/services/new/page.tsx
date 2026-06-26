@@ -1,4 +1,4 @@
-import { ServiceForm } from "./ServiceForm"
+import { ServiceForm } from "../components/ServiceForm"
 import { createService } from "../actions"
 
 export default function NewServicePage() {

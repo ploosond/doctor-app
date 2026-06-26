@@ -4,12 +4,13 @@ import { redirect } from "next/navigation"
 import { headers } from "next/headers"
 import Link from "next/link"
 import { getAuth } from "@/lib/auth"
-import { AdminSignOut } from "./AdminSignOut"
+import { AdminSignOut } from "./components/AdminSignOut"
 import { Logo } from "@/components/Logo"
 
 const NAV = [
   { label: "Dashboard", href: "/admin/dashboard", icon: "▪" },
   { label: "Appointments", href: "/admin/appointments", icon: "▪" },
+  { label: "Availability", href: "/admin/availability", icon: "▪" },
   { label: "Patients", href: "/admin/patients", icon: "▪" },
   { label: "Services", href: "/admin/services", icon: "▪" },
 ]
