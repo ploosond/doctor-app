@@ -3,13 +3,14 @@
 import { useState, useEffect, useCallback } from "react";
 import { useLang } from "@/lib/i18n";
 import { ArrowRight } from "lucide-react";
+import { demoImage } from "@/lib/demo-image";
 
 const CAROUSEL_SLIDES = [
-  { label: "Dr. Lila — consultations",               prompt: "psychiatrist-doctor-consultation",  seed: 1 },
-  { label: "Clinical environment — privacy & comfort", prompt: "modern-clinic-interior-private",    seed: 2 },
-  { label: "Evidence-based care — therapy",           prompt: "mental-health-therapy-assessment",  seed: 3 },
-  { label: "Medication management — personalized",    prompt: "medication-management-pharmacy",    seed: 4 },
-  { label: "Follow-up support — ongoing wellness",    prompt: "mental-wellness-follow-up-support", seed: 5 },
+  { label: "Dr. Lila — consultations",                 img: "samples/people/smiling-man" },
+  { label: "Clinical environment — privacy & comfort", img: "samples/landscapes/girl-urban-view" },
+  { label: "Evidence-based care — therapy",            img: "samples/people/kitchen-bar" },
+  { label: "Medication management — personalized",     img: "samples/landscapes/beach-boat" },
+  { label: "Follow-up support — ongoing wellness",     img: "samples/landscapes/nature-mountains" },
 ];
 
 export function HeroSection() {
@@ -44,7 +45,7 @@ export function HeroSection() {
       }}
     >
       {/* Carousel backgrounds */}
-      {CAROUSEL_SLIDES.map(({ prompt, seed }, i) => (
+      {CAROUSEL_SLIDES.map(({ img }, i) => (
         <div
           key={i}
           style={{
@@ -57,7 +58,7 @@ export function HeroSection() {
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={`https://picsum.photos/seed/${seed}/1440/900`}
+            src={demoImage(img, 1440, 900)}
             alt=""
             style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
           />

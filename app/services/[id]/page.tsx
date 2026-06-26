@@ -3,6 +3,7 @@ export const revalidate = 3600 // ISR — regenerate hourly; first build can't r
 import { notFound } from "next/navigation"
 import type { Metadata } from "next"
 import { getServiceBySlug } from "@/lib/services/catalog"
+import { sampleImageUrl } from "@/lib/cloudinary-sample"
 import { ServiceDetailClient, type ServiceDoc } from "../components/ServiceDetailClient"
 
 type Props = { params: Promise<{ id: string }> }
@@ -37,5 +38,6 @@ export default async function ServicePage({ params }: Props) {
   const { id } = await params
   const svc = await getService(id)
   if (!svc) notFound()
-  return <ServiceDetailClient svc={JSON.parse(JSON.stringify(svc))} />
+  const resolved = { ...svc, image: svc.image ?? svc.ogImage ?? sampleImageUrl(id) }
+  return <ServiceDetailClient svc={JSON.parse(JSON.stringify(resolved))} />
 }

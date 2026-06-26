@@ -193,7 +193,7 @@ export function ServiceDetailClient({ svc }: { svc: ServiceDoc }) {
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={svc.image ?? svc.ogImage ?? `https://picsum.photos/seed/${svc.slug.split("").reduce((a, c) => a + c.charCodeAt(0), 0)}/600/480`}
+                src={svc.image ?? svc.ogImage}
                 alt={c.name}
                 style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
               />

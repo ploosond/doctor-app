@@ -78,3 +78,26 @@ export function emailPatient(subject: string, line: string): { subject: string; 
     html: `<p>${line.replace(/\n/g, "<br/>")}</p><p>— ${CLINIC}</p>`,
   }
 }
+
+// ---- Auth emails (admin account recovery / verification) ----
+
+export function emailResetPassword(url: string): { subject: string; html: string } {
+  return {
+    subject: `Reset your ${CLINIC} password`,
+    html:
+      `<h2>Reset your password</h2>` +
+      `<p>We received a request to reset the password for your ${CLINIC} admin account.</p>` +
+      `<p><a href="${url}">Set a new password</a></p>` +
+      `<p>If you didn't request this, you can safely ignore this email.</p>`,
+  }
+}
+
+export function emailVerify(url: string): { subject: string; html: string } {
+  return {
+    subject: `Verify your ${CLINIC} email`,
+    html:
+      `<h2>Verify your email</h2>` +
+      `<p>Confirm this address to finish setting up your ${CLINIC} admin account.</p>` +
+      `<p><a href="${url}">Verify email</a></p>`,
+  }
+}

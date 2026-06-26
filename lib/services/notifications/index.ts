@@ -3,6 +3,7 @@
 // notification failure cannot break a booking or a status change.
 
 import { connectDB } from "@/lib/db"
+import { env } from "@/lib/env"
 import { AppointmentModel } from "@/models/appointment"
 import { sendEmail } from "./email"
 import {
@@ -11,7 +12,14 @@ import {
   msgCancelled,
   emailNewRequestClinic,
   emailPatient,
+  emailResetPassword,
+  emailVerify,
 } from "./templates"
+
+// Re-export so auth callbacks (and any server code) can send mail through the
+// notifications public API instead of importing the internal module.
+export { sendEmail }
+export { emailResetPassword, emailVerify }
 
 type PopulatedPatient = { name?: string; phone?: string; email?: string }
 
@@ -31,7 +39,7 @@ export async function notifyNewRequest(appointmentId: string): Promise<void> {
     if (!data) return
     const { appt, patient } = data
 
-    const clinicInbox = process.env.CLINIC_NOTIFY_EMAIL
+    const clinicInbox = env.CLINIC_NOTIFY_EMAIL
     if (clinicInbox && patient.name) {
       const mail = emailNewRequestClinic({
         name: patient.name,

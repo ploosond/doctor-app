@@ -48,7 +48,48 @@ export async function getAvailableSlotsForDate(
 
   const booked = await AppointmentModel.find(query).select("slotStart slotEnd").lean()
 
-  return generateSlots(dateISO, availability, booked)
+  return generateSlots(dateISO, availability, booked, new Date())
+}
+
+function isoForOffset(base: Date, offset: number): string {
+  const d = new Date(base)
+  d.setDate(d.getDate() + offset)
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`
+}
+
+/**
+ * First date on/after `fromISO` that has any free slot, within `withinDays`.
+ * Loads availability + the window's active appointments once, then scans locally.
+ * Returns null when nothing is bookable (e.g. no enabled days, or fully booked).
+ */
+export async function findNextAvailableDate(
+  fromISO: string,
+  withinDays = 60
+): Promise<{ dateISO: string; slots: Slot[] } | null> {
+  await connectDB()
+
+  const availability = ((await AvailabilityModel.findById("singleton").lean()) ??
+    DEFAULT_AVAILABILITY) as unknown as AvailabilityLike
+
+  const fromBase = new Date(`${fromISO}T00:00:00`)
+  if (isNaN(fromBase.getTime())) return null
+  const windowEnd = new Date(fromBase)
+  windowEnd.setDate(windowEnd.getDate() + withinDays + 1)
+
+  const booked = await AppointmentModel.find({
+    status: { $in: ACTIVE_STATUSES },
+    slotStart: { $gte: fromBase, $lt: windowEnd },
+  })
+    .select("slotStart slotEnd")
+    .lean()
+
+  const now = new Date()
+  for (let offset = 0; offset <= withinDays; offset++) {
+    const dateISO = isoForOffset(fromBase, offset)
+    const slots = generateSlots(dateISO, availability, booked, now)
+    if (slots.length > 0) return { dateISO, slots }
+  }
+  return null
 }
 
 export type BookingPayload = {

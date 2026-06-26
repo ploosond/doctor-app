@@ -33,14 +33,15 @@ function overlaps(aStart: Date, aEnd: Date, bStart: Date, bEnd: Date): boolean {
 /**
  * Generate bookable slots for a single date.
  *
- * TZ note: "HH:MM" working hours are interpreted against the given date in the
- * runtime's local time. Asia/Kathmandu (UTC+5:45) correctness is a documented
- * follow-up, not handled here.
+ * TZ: "HH:MM" working hours are interpreted in the process timezone, which is
+ * pinned to Asia/Kathmandu via the `TZ` env var (Nepal has no DST). Keep `TZ`
+ * set in every environment so slot times match clinic time.
  */
 export function generateSlots(
   dateISO: string,
   availability: AvailabilityLike,
-  booked: BookedLike[]
+  booked: BookedLike[],
+  minStart?: Date
 ): Slot[] {
   const base = new Date(`${dateISO}T00:00:00`)
   if (isNaN(base.getTime())) return []
@@ -73,6 +74,7 @@ export function generateSlots(
     for (let t = dayStart.getTime(); t + durationMs <= dayEnd.getTime() + 1; t += step * 60_000) {
       const start = new Date(t)
       const end = new Date(t + durationMs)
+      if (minStart && start <= minStart) continue // drop past times (e.g. earlier today)
       const taken = bookedRanges.some((b) => overlaps(start, end, b.start, b.end))
       if (!taken) slots.push({ start, end })
     }

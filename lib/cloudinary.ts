@@ -1,9 +1,10 @@
 import { v2 as cloudinary } from "cloudinary"
+import { env } from "@/lib/env"
 
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME!,
-  api_key:    process.env.CLOUDINARY_API_KEY!,
-  api_secret: process.env.CLOUDINARY_API_SECRET!,
+  cloud_name: env.CLOUDINARY_CLOUD_NAME,
+  api_key:    env.CLOUDINARY_API_KEY,
+  api_secret: env.CLOUDINARY_API_SECRET,
 })
 
 export async function deleteImage(url: string): Promise<void> {
@@ -12,7 +13,12 @@ export async function deleteImage(url: string): Promise<void> {
   await cloudinary.uploader.destroy(match[1])
 }
 
-export async function uploadImage(file: File, folder = "dr-lila/services"): Promise<string> {
+// Folder root scoped per environment so dev/prod uploads stay separate within a
+// shared Cloudinary cloud. Set CLOUDINARY_FOLDER per env (e.g. dr-lila-dev / dr-lila-prod).
+const FOLDER_ROOT = env.CLOUDINARY_FOLDER ?? "dr-lila"
+
+export async function uploadImage(file: File, subfolder = "services"): Promise<string> {
+  const folder = `${FOLDER_ROOT}/${subfolder}`
   const buffer = Buffer.from(await file.arrayBuffer())
   return new Promise((resolve, reject) => {
     cloudinary.uploader

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { signIn, useSession } from "@/lib/auth-client"
 
 export default function LoginPage() {
@@ -197,6 +198,12 @@ export default function LoginPage() {
             {loading ? "Signing in…" : "Sign in"}
           </button>
         </form>
+
+        <p style={{ fontSize: 14, color: "var(--color-text-muted)", margin: "18px 0 0", textAlign: "center" }}>
+          <Link href="/forgot-password" style={{ color: "var(--color-brand)", fontWeight: 600, textDecoration: "none" }}>
+            Forgot password?
+          </Link>
+        </p>
       </div>
     </div>
   )

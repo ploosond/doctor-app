@@ -83,7 +83,7 @@ export function ServicesSection({ services }: { services: ServiceCardData[] }) {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 className="svc-img"
-                src={svc.image ?? `https://picsum.photos/seed/${svc.slug}/400/300`}
+                src={svc.image}
                 alt=""
                 style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
               />

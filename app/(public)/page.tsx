@@ -1,6 +1,7 @@
 export const revalidate = 3600 // ISR — regenerate hourly; first build can't reach private-VPC Mongo
 
 import { listServices } from "@/lib/services/catalog"
+import { sampleImageUrl } from "@/lib/cloudinary-sample"
 import { Nav } from "./components/Nav";
 import { HeroSection } from "./components/HeroSection";
 import { TrustStatsSection } from "./components/TrustStatsSection";
@@ -31,7 +32,7 @@ async function getVisibleServices(): Promise<ServiceCardData[]> {
       const ne = s.content?.ne ?? {}
       return {
         slug:         s.slug,
-        image:        s.image,
+        image:        s.image ?? sampleImageUrl(s.slug),
         name:         en.name ?? "",
         tag:          en.tag  ?? "",
         nameFallback: ne.name || en.name || "",

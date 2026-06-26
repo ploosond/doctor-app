@@ -22,6 +22,12 @@ export async function seedAdmin(client: MongoClient): Promise<void> {
   } catch {
     console.log("  admin: user already exists — skipping")
   }
+
+  // Pre-verify the seeded admin so requireEmailVerification doesn't block login.
+  await client
+    .db()
+    .collection("user")
+    .updateOne({ email: ADMIN_EMAIL }, { $set: { emailVerified: true } })
 }
 
 // Standalone runner

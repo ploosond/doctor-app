@@ -1,7 +1,7 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
-import { getAvailableSlotsForDate, createBooking, type BookingPayload, type BookingResult } from "@/lib/services/booking"
+import { getAvailableSlotsForDate, findNextAvailableDate, createBooking, type BookingPayload, type BookingResult, type Slot } from "@/lib/services/booking"
 import { rateLimit, clientIp } from "@/lib/rate-limit"
 
 // Reject submissions that arrive sooner than a human could plausibly fill the form.
@@ -13,11 +13,7 @@ function timeLabel(d: Date) {
 
 export type PublicSlot = { startISO: string; endISO: string; label: string; startLabel: string; endLabel: string }
 
-export async function getSlots(dateISO: string): Promise<PublicSlot[]> {
-  if (!dateISO) return []
-  const ip = await clientIp()
-  if (!rateLimit(`slots:${ip}`, { limit: 30, windowMs: 60_000 }).ok) return []
-  const slots = await getAvailableSlotsForDate(dateISO)
+function toPublicSlots(slots: Slot[]): PublicSlot[] {
   return slots.map((s) => ({
     startISO: new Date(s.start).toISOString(),
     endISO: new Date(s.end).toISOString(),
@@ -25,6 +21,24 @@ export async function getSlots(dateISO: string): Promise<PublicSlot[]> {
     startLabel: timeLabel(s.start),
     endLabel: timeLabel(s.end),
   }))
+}
+
+export async function getSlots(dateISO: string): Promise<PublicSlot[]> {
+  if (!dateISO) return []
+  const ip = await clientIp()
+  if (!rateLimit(`slots:${ip}`, { limit: 30, windowMs: 60_000 }).ok) return []
+  return toPublicSlots(await getAvailableSlotsForDate(dateISO))
+}
+
+export async function getNextAvailable(
+  fromISO: string
+): Promise<{ dateISO: string; slots: PublicSlot[] } | null> {
+  if (!fromISO) return null
+  const ip = await clientIp()
+  if (!rateLimit(`slots:${ip}`, { limit: 30, windowMs: 60_000 }).ok) return null
+  const res = await findNextAvailableDate(fromISO)
+  if (!res) return null
+  return { dateISO: res.dateISO, slots: toPublicSlots(res.slots) }
 }
 
 export async function submitBooking(payload: BookingPayload): Promise<BookingResult> {

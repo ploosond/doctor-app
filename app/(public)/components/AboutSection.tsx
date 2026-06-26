@@ -2,6 +2,7 @@
 
 import { useLang } from "@/lib/i18n";
 import { Check, ArrowRight } from "lucide-react";
+import { demoImage } from "@/lib/demo-image";
 
 const CHECKS = [
   "chk1", "chk2", "chk3", "chk4", "chk5", "chk6",
@@ -77,7 +78,7 @@ export function AboutSection() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             className="about-photo"
-            src="https://picsum.photos/seed/42/420/520"
+            src={demoImage("samples/people/jazz", 420, 520)}
             alt="Dr. Lila"
           />
         </div>

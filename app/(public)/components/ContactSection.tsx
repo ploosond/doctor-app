@@ -2,6 +2,7 @@
 
 import { useLang } from "@/lib/i18n";
 import { Phone } from "lucide-react";
+import { demoImage } from "@/lib/demo-image";
 
 export function ContactSection() {
   const { t } = useLang();
@@ -91,7 +92,7 @@ export function ContactSection() {
         <div style={{ borderRadius: 22, overflow: "hidden", aspectRatio: "4/3" }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="https://picsum.photos/seed/77/600/450"
+            src={demoImage("samples/landscapes/nature-mountains", 600, 450)}
             alt="Clinic"
             style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
           />

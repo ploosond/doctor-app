@@ -4,7 +4,8 @@ import { useState, useRef, useEffect } from "react"
 import { useLang } from "@/lib/i18n"
 import { Check, ChevronRight, ChevronLeft, Clock } from "lucide-react"
 import type { ServiceCardData } from "./ServicesSection"
-import { getSlots, submitBooking, type PublicSlot } from "../actions"
+import { getSlots, getNextAvailable, submitBooking, type PublicSlot } from "../actions"
+import { demoImage } from "@/lib/demo-image"
 
 const FORM_ACCENT = "var(--color-accent)"
 const FORM_ACCENT_FILL = "var(--color-surface)"
@@ -70,6 +71,7 @@ export function BookingSection({ services }: { services: ServiceCardData[] }) {
   const [slots, setSlots] = useState<PublicSlot[]>([])
   const [slot, setSlot] = useState<PublicSlot | null>(null)
   const [loadingSlots, setLoadingSlots] = useState(false)
+  const [noAvailability, setNoAvailability] = useState(false) // no enabled days / nothing bookable
 
   const [name, setName] = useState("")
   const [phone, setPhone] = useState("")
@@ -103,12 +105,33 @@ export function BookingSection({ services }: { services: ServiceCardData[] }) {
     }
   }
 
+  // Land on the soonest day that actually has free times (today if open, else later).
+  async function jumpToNextAvailable(fromISO: string) {
+    setLoadingSlots(true)
+    setSlot(null)
+    setShowAllSlots(false)
+    try {
+      const res = await getNextAvailable(fromISO)
+      if (res) {
+        setNoAvailability(false)
+        setWindowStart(res.dateISO)
+        setDate(res.dateISO)
+        setSlots(res.slots)
+      } else {
+        // No enabled days / nothing bookable within the window.
+        setNoAvailability(true)
+        setDate("")
+        setSlots([])
+      }
+    } finally {
+      setLoadingSlots(false)
+    }
+  }
+
   function goToStep2() {
-    const t0 = todayISO()
-    setWindowStart(t0)
     setError(null)
     setStep(2)
-    onDateChange(t0)
+    jumpToNextAvailable(todayISO())
   }
 
   async function onSubmit() {
@@ -160,6 +183,7 @@ export function BookingSection({ services }: { services: ServiceCardData[] }) {
     setReason("")
     setConsent(false)
     setHp("")
+    setNoAvailability(false)
     setError(null)
   }
 
@@ -264,7 +288,7 @@ export function BookingSection({ services }: { services: ServiceCardData[] }) {
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src='https://picsum.photos/seed/booking/640/820'
+              src={demoImage("samples/people/smiling-man", 640, 820)}
               alt=''
               style={{
                 position: "absolute",
@@ -411,7 +435,7 @@ export function BookingSection({ services }: { services: ServiceCardData[] }) {
                       margin: 0,
                     }}
                   >
-                    {b.no_slots}{" "}
+                    {b.services_unavailable}{" "}
                     <a
                       href='#contact'
                       style={{ color: FORM_ACCENT, fontWeight: 600 }}
@@ -467,6 +491,21 @@ export function BookingSection({ services }: { services: ServiceCardData[] }) {
             {/* Step 2 — date & slot */}
             {step === 2 && (
               <div>
+                {noAvailability ? (
+                  <p
+                    style={{
+                      color: "var(--color-text-muted)",
+                      fontSize: 16,
+                      margin: 0,
+                    }}
+                  >
+                    {b.no_availability}{" "}
+                    <a href='#contact' style={{ color: FORM_ACCENT, fontWeight: 600 }}>
+                      {t.call_today}
+                    </a>
+                  </p>
+                ) : (
+                  <>
                 <div
                   style={{
                     display: "flex",
@@ -609,15 +648,32 @@ export function BookingSection({ services }: { services: ServiceCardData[] }) {
                     {b.loading_slots}
                   </p>
                 ) : slots.length === 0 ? (
-                  <p
-                    style={{
-                      color: "var(--color-text-muted)",
-                      fontSize: 15,
-                      margin: 0,
-                    }}
-                  >
-                    {b.no_slots}
-                  </p>
+                  <div>
+                    <p
+                      style={{
+                        color: "var(--color-text-muted)",
+                        fontSize: 15,
+                        margin: "0 0 10px",
+                      }}
+                    >
+                      {b.no_slots_day}
+                    </p>
+                    <button
+                      type='button'
+                      onClick={() => jumpToNextAvailable(addDays(date, 1))}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        padding: 0,
+                        cursor: "pointer",
+                        fontSize: 15,
+                        fontWeight: 700,
+                        color: FORM_ACCENT,
+                      }}
+                    >
+                      {b.next_available} →
+                    </button>
+                  </div>
                 ) : (
                   <>
                     <div
@@ -713,6 +769,8 @@ export function BookingSection({ services }: { services: ServiceCardData[] }) {
                       </span>
                     </div>
                   </div>
+                )}
+                  </>
                 )}
               </div>
             )}
