@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import * as appointments from "@/lib/services/appointments"
 import type { AppointmentMode, AppointmentStatus } from "@/lib/services/appointments"
+import { requireSession } from "@/lib/auth-guard"
 
 function parseSlot(fd: FormData): { slotStart: Date; slotEnd: Date } {
   const slot = (fd.get("slot") as string)?.trim() // "startISO|endISO"
@@ -12,6 +13,7 @@ function parseSlot(fd: FormData): { slotStart: Date; slotEnd: Date } {
 }
 
 export async function createAppointment(fd: FormData) {
+  await requireSession()
   const patientRef = (fd.get("patientRef") as string)?.trim()
   const service = (fd.get("service") as string)?.trim()
   const mode = ((fd.get("mode") as string) || "in_person") as AppointmentMode
@@ -28,6 +30,7 @@ export async function createAppointment(fd: FormData) {
 }
 
 export async function updateAppointment(id: string, fd: FormData) {
+  await requireSession()
   const service = (fd.get("service") as string)?.trim()
   const mode = ((fd.get("mode") as string) || "in_person") as AppointmentMode
   const slotRaw = (fd.get("slot") as string)?.trim()
@@ -43,6 +46,7 @@ export async function updateAppointment(id: string, fd: FormData) {
 }
 
 export async function deleteAppointment(id: string) {
+  await requireSession()
   await appointments.deleteAppointment(id)
   revalidatePath("/admin/appointments")
   revalidatePath("/admin/dashboard")
@@ -50,6 +54,7 @@ export async function deleteAppointment(id: string) {
 }
 
 export async function updateAppointmentStatus(id: string, status: string) {
+  await requireSession()
   await appointments.setStatus(id, status)
   revalidatePath("/admin/appointments")
   revalidatePath(`/admin/appointments/${id}`)
@@ -57,6 +62,7 @@ export async function updateAppointmentStatus(id: string, status: string) {
 }
 
 export async function updateAppointmentNotes(id: string, notes: string) {
+  await requireSession()
   await appointments.setNotes(id, notes)
   revalidatePath(`/admin/appointments/${id}`)
 }

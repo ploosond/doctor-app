@@ -101,6 +101,7 @@
     "submitting": "Sending…",
     "required": "Please fill in your name, phone and consent.",
     "slot_taken": "Sorry, that time was just booked. Please choose another slot.",
+    "rate_limited": "Too many requests — please wait a little while and try again.",
     "success_title": "Request received",
     "success_msg": "Thank you. Your appointment request has been received — the clinic will confirm it with you by phone shortly.",
     "success_again": "Book another appointment",

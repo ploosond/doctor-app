@@ -2,8 +2,10 @@
 
 import { revalidatePath } from "next/cache"
 import { saveAvailability, type WorkingHour } from "@/lib/services/availability"
+import { requireSession } from "@/lib/auth-guard"
 
 export async function updateAvailability(fd: FormData) {
+  await requireSession()
   const workingHours: WorkingHour[] = []
   for (let day = 0; day <= 6; day++) {
     const start = (fd.get(`start_${day}`) as string) ?? ""

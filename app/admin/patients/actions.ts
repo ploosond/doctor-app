@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import * as patients from "@/lib/services/patients"
 import type { Gender, PatientInput, VisitInput } from "@/lib/services/patients"
+import { requireSession } from "@/lib/auth-guard"
 
 function str(fd: FormData, key: string): string | undefined {
   const v = (fd.get(key) as string | null)?.trim()
@@ -44,12 +45,14 @@ function visitFields(fd: FormData): VisitInput {
 }
 
 export async function createPatient(fd: FormData) {
+  await requireSession()
   const id = await patients.createPatient(patientFields(fd))
   revalidatePath("/admin/patients")
   redirect(`/admin/patients/${id}`)
 }
 
 export async function updatePatient(id: string, fd: FormData) {
+  await requireSession()
   await patients.updatePatient(id, patientFields(fd))
   revalidatePath("/admin/patients")
   revalidatePath(`/admin/patients/${id}`)
@@ -57,22 +60,26 @@ export async function updatePatient(id: string, fd: FormData) {
 }
 
 export async function deletePatient(id: string) {
+  await requireSession()
   await patients.softDeletePatient(id)
   revalidatePath("/admin/patients")
   redirect("/admin/patients")
 }
 
 export async function restorePatient(id: string) {
+  await requireSession()
   await patients.restorePatient(id)
   revalidatePath("/admin/patients")
 }
 
 export async function updatePatientNotes(id: string, notes: string) {
+  await requireSession()
   await patients.setPatientNotes(id, notes)
   revalidatePath(`/admin/patients/${id}`)
 }
 
 export async function addVisit(patientId: string, fd: FormData) {
+  await requireSession()
   const fields = visitFields(fd)
   await patients.addVisit(patientId, fields)
   revalidatePath(`/admin/patients/${patientId}`)
@@ -80,11 +87,13 @@ export async function addVisit(patientId: string, fd: FormData) {
 }
 
 export async function updateVisit(visitId: string, patientId: string, fd: FormData) {
+  await requireSession()
   await patients.updateVisit(visitId, visitFields(fd))
   revalidatePath(`/admin/patients/${patientId}`)
 }
 
 export async function deleteVisit(visitId: string, patientId: string) {
+  await requireSession()
   await patients.deleteVisit(visitId)
   revalidatePath(`/admin/patients/${patientId}`)
 }

@@ -29,6 +29,6 @@ export async function saveAvailability(input: AvailabilityInput): Promise<void> 
       bufferMins: input.bufferMins,
       blockedDates: input.blockedDates,
     },
-    { upsert: true, new: true, setDefaultsOnInsert: true }
+    { upsert: true, setDefaultsOnInsert: true }
   )
 }

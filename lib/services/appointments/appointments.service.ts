@@ -86,13 +86,17 @@ export async function appointmentStats(): Promise<{ today: number; pending: numb
   await connectDB()
   const now = new Date()
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const todayEnd = new Date(todayStart)
+  todayEnd.setDate(todayEnd.getDate() + 1)
   const weekStart = new Date(todayStart)
   weekStart.setDate(weekStart.getDate() - weekStart.getDay())
+  const weekEnd = new Date(weekStart)
+  weekEnd.setDate(weekEnd.getDate() + 7)
 
   const [today, pending, week] = await Promise.all([
-    AppointmentModel.countDocuments({ slotStart: { $gte: todayStart } }),
+    AppointmentModel.countDocuments({ slotStart: { $gte: todayStart, $lt: todayEnd } }),
     AppointmentModel.countDocuments({ status: "requested" }),
-    AppointmentModel.countDocuments({ slotStart: { $gte: weekStart } }),
+    AppointmentModel.countDocuments({ slotStart: { $gte: weekStart, $lt: weekEnd } }),
   ])
   return { today, pending, week }
 }

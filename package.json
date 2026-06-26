@@ -6,7 +6,15 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "seed": "tsx scripts/seed/index.ts",
+    "seed:fresh": "tsx scripts/seed/index.ts --fresh",
+    "seed:admin": "tsx scripts/seed/admin.ts",
+    "seed:services": "tsx scripts/seed/services.ts",
+    "seed:availability": "tsx scripts/seed/availability.ts",
+    "seed:patients": "tsx scripts/seed/patients.ts",
+    "seed:appointments": "tsx scripts/seed/appointments.ts",
+    "seed:visits": "tsx scripts/seed/visits.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",

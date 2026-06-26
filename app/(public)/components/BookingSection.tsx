@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 import { useLang } from "@/lib/i18n"
 import { Check, ChevronRight, ChevronLeft, Clock } from "lucide-react"
 import type { ServiceCardData } from "./ServicesSection"
@@ -76,6 +76,11 @@ export function BookingSection({ services }: { services: ServiceCardData[] }) {
   const [email, setEmail] = useState("")
   const [reason, setReason] = useState("")
   const [consent, setConsent] = useState(false)
+  const [hp, setHp] = useState("") // honeypot — real users never see/fill this
+  const renderedAt = useRef(0) // form-mount time, for bot submit-timing
+  useEffect(() => {
+    renderedAt.current = Date.now()
+  }, [])
 
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -123,6 +128,8 @@ export function BookingSection({ services }: { services: ServiceCardData[] }) {
         slotStartISO: slot.startISO,
         slotEndISO: slot.endISO,
         consent,
+        hp,
+        renderedAt: renderedAt.current,
       })
       if (res.ok) {
         setStep(4)
@@ -131,6 +138,8 @@ export function BookingSection({ services }: { services: ServiceCardData[] }) {
         setSlot(null)
         setStep(2)
         if (date) await onDateChange(date)
+      } else if (res.reason === "rate_limited") {
+        setError(b.rate_limited)
       } else {
         setError(b.required)
       }
@@ -150,6 +159,7 @@ export function BookingSection({ services }: { services: ServiceCardData[] }) {
     setEmail("")
     setReason("")
     setConsent(false)
+    setHp("")
     setError(null)
   }
 
@@ -739,6 +749,30 @@ export function BookingSection({ services }: { services: ServiceCardData[] }) {
                 <div
                   style={{ display: "flex", flexDirection: "column", gap: 14 }}
                 >
+                  {/* Honeypot — off-screen (not display:none, which bots skip).
+                      Real users never see or fill it; a non-empty value = bot. */}
+                  <div
+                    aria-hidden
+                    style={{
+                      position: "absolute",
+                      left: "-9999px",
+                      width: 1,
+                      height: 1,
+                      overflow: "hidden",
+                    }}
+                  >
+                    <label>
+                      Company
+                      <input
+                        type="text"
+                        name="company"
+                        tabIndex={-1}
+                        autoComplete="off"
+                        value={hp}
+                        onChange={(e) => setHp(e.target.value)}
+                      />
+                    </label>
+                  </div>
                   <div>
                     <label style={labelStyle}>{b.name_label}</label>
                     <input

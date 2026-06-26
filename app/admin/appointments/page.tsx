@@ -82,6 +82,7 @@ export default async function AppointmentsPage({
           ["confirmed", "Confirmed"],
           ["completed", "Completed"],
           ["cancelled", "Cancelled"],
+          ["no_show", "No-show"],
         ].map(([val, label]) => (
           <Link
             key={val}

@@ -60,9 +60,12 @@ export type BookingPayload = {
   slotStartISO: string
   slotEndISO: string
   consent: boolean
+  // Bot signals — validated/stripped in the action layer, never persisted.
+  hp?: string
+  renderedAt?: number
 }
 
-export type BookingResult = { ok: true } | { ok: false; reason: "invalid" | "slot_taken" }
+export type BookingResult = { ok: true } | { ok: false; reason: "invalid" | "slot_taken" | "rate_limited" }
 
 /** Public-booking write path: find-or-create patient, create a requested appointment, notify the clinic. */
 export async function createBooking(payload: BookingPayload): Promise<BookingResult> {

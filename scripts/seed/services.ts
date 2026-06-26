@@ -1,17 +1,6 @@
-/**
- * Seeds the 6 services from messages/en.json + messages/ne.json into MongoDB.
- * Run: pnpm tsx scripts/seed-services.ts
- * Idempotent — skips if 6+ services already exist.
- */
-import { config } from "dotenv"
-import { resolve } from "path"
-
-config({ path: resolve(process.cwd(), ".env.local") })
-
-import mongoose from "mongoose"
-
-const MONGODB_URI = process.env.MONGODB_URI!
-if (!MONGODB_URI) throw new Error("MONGODB_URI not set in .env.local")
+import { pathToFileURL } from "url"
+import { connect, disconnect } from "./db"
+import { ServiceModel } from "../../models/service"
 
 const SERVICES = [
   {
@@ -316,27 +305,23 @@ const SERVICES = [
   },
 ]
 
-async function main() {
-  console.log("Connecting to MongoDB…")
-  await mongoose.connect(MONGODB_URI)
-
-  const { ServiceModel } = await import("../models/service")
-
+export async function seedServices(): Promise<string[]> {
+  const slugs = SERVICES.map((s) => s.slug)
   const count = await ServiceModel.countDocuments()
-  if (count >= 6) {
-    console.log(`  Services already seeded (${count} found) — skipping.`)
-    await mongoose.disconnect()
-    return
+  if (count >= SERVICES.length) {
+    console.log(`  services: ${count} already present — skipping`)
+    return slugs
   }
-
   await ServiceModel.insertMany(SERVICES)
-  console.log("✓ 6 services seeded")
-
-  await mongoose.disconnect()
-  console.log("\nDone. Visit http://localhost:3000/admin/services")
+  console.log(`✓ services: seeded ${SERVICES.length}`)
+  return slugs
 }
 
-main().catch((e) => {
-  console.error(e)
-  process.exit(1)
-})
+// Standalone runner
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+  void (async () => {
+    await connect()
+    await seedServices()
+    await disconnect()
+  })()
+}

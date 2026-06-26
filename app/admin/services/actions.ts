@@ -9,6 +9,7 @@ import {
   deleteService as deleteServiceSvc,
   type ServiceInput,
 } from "@/lib/services/catalog"
+import { requireSession } from "@/lib/auth-guard"
 
 function parseIncluded(fd: FormData, lang: "en" | "ne"): string[] {
   const items: string[] = []
@@ -55,6 +56,7 @@ function buildInput(fd: FormData): ServiceInput {
 }
 
 export async function createService(fd: FormData) {
+  await requireSession()
   await createServiceSvc(buildInput(fd), fd.get("image") as File | null)
   revalidatePath("/admin/services")
   revalidatePath("/")
@@ -62,6 +64,7 @@ export async function createService(fd: FormData) {
 }
 
 export async function updateService(slug: string, fd: FormData) {
+  await requireSession()
   await updateServiceSvc(slug, buildInput(fd), fd.get("image") as File | null)
   revalidatePath("/admin/services")
   revalidatePath(`/services/${slug}`)
@@ -70,6 +73,7 @@ export async function updateService(slug: string, fd: FormData) {
 }
 
 export async function toggleServiceVisibility(slug: string) {
+  await requireSession()
   await toggleVisibility(slug)
   revalidatePath("/admin/services")
   revalidatePath("/")
@@ -77,6 +81,7 @@ export async function toggleServiceVisibility(slug: string) {
 }
 
 export async function deleteService(slug: string) {
+  await requireSession()
   await deleteServiceSvc(slug)
   revalidatePath("/admin/services")
   revalidatePath("/")
