@@ -1,6 +1,7 @@
 import { listPatients, latestVisitByPatient } from "@/lib/services/patients"
 import { restorePatient } from "./actions"
 import Link from "next/link"
+import { FlashBanner } from "../components/FlashBanner"
 
 function formatDate(d: Date) {
   return new Date(d).toLocaleDateString("en-GB", {
@@ -13,9 +14,9 @@ function formatDate(d: Date) {
 export default async function PatientsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; deleted?: string }>
+  searchParams: Promise<{ q?: string; deleted?: string; flash?: string }>
 }) {
-  const { q, deleted } = await searchParams
+  const { q, deleted, flash } = await searchParams
   const showDeleted = deleted === "1"
 
   const patients = await listPatients({ q, deleted: showDeleted })
@@ -35,25 +36,10 @@ export default async function PatientsPage({
     .sort(([, a], [, b]) => new Date(a).getTime() - new Date(b).getTime())
 
   return (
-    <div style={{ padding: "36px 40px" }}>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: 28,
-        }}
-      >
-        <h1
-          style={{
-            fontFamily: "var(--font-heading), serif",
-            fontWeight: 500,
-            fontSize: 28,
-            letterSpacing: "-0.01em",
-            color: "var(--color-text)",
-            margin: 0,
-          }}
-        >
+    <div className="admin-page">
+      <FlashBanner code={flash} />
+      <div className="admin-page-head">
+        <h1 className="admin-h1" style={{ margin: 0 }}>
           {showDeleted ? "Deleted patients" : "Patients"}
         </h1>
         <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
@@ -61,7 +47,7 @@ export default async function PatientsPage({
             href={showDeleted ? "/admin/patients" : "/admin/patients?deleted=1"}
             style={{
               fontSize: 14,
-              color: "var(--color-text-muted)",
+              color: "var(--admin-muted)",
               fontWeight: 600,
               textDecoration: "none",
             }}
@@ -72,8 +58,8 @@ export default async function PatientsPage({
             <Link
               href="/admin/patients/new"
               style={{
-                padding: "11px 22px",
-                borderRadius: 10,
+                padding: "10px 20px",
+                borderRadius: 8,
                 background: "var(--color-brand)",
                 color: "#fff",
                 fontSize: 15,
@@ -139,12 +125,15 @@ export default async function PatientsPage({
           defaultValue={q}
           placeholder="Search by name, phone or email…"
           style={{
-            padding: "12px 18px",
-            borderRadius: 10,
-            border: "1.5px solid var(--color-accent)",
-            fontSize: 16,
+            padding: "11px 16px",
+            borderRadius: 8,
+            border: "1px solid var(--admin-border)",
+            background: "var(--admin-card)",
+            fontSize: 15,
             color: "var(--color-text)",
-            width: 320,
+            width: "100%",
+            maxWidth: 320,
+            boxSizing: "border-box",
             outline: "none",
           }}
         />
@@ -155,9 +144,10 @@ export default async function PatientsPage({
           style={{
             padding: "60px",
             textAlign: "center",
-            color: "var(--color-text-muted)",
-            fontSize: 16,
-            background: "var(--color-surface)",
+            color: "var(--admin-muted)",
+            fontSize: 15,
+            background: "var(--admin-card)",
+            border: "1px solid var(--admin-border)",
             borderRadius: 12,
           }}
         >
@@ -165,30 +155,31 @@ export default async function PatientsPage({
         </div>
       ) : (
         <table
+          className="admin-table"
           style={{
-            width: "100%",
-            borderCollapse: "collapse",
-            fontSize: 16,
+            fontSize: 15,
             color: "var(--color-text)",
-            background: "#fff",
-            borderRadius: 14,
+            background: "var(--admin-card)",
+            border: "1px solid var(--admin-border)",
+            borderRadius: 12,
             overflow: "hidden",
-            boxShadow: "0 2px 8px rgba(23,42,58,0.06)",
+            boxShadow: "var(--admin-shadow)",
           }}
         >
           <thead>
             <tr
               style={{
-                background: "var(--color-surface)",
-                color: "var(--color-text-muted)",
-                fontSize: 14,
+                background: "#FAFBFC",
+                borderBottom: "1px solid var(--admin-border)",
+                color: "var(--admin-muted)",
+                fontSize: 12.5,
                 fontWeight: 600,
                 textTransform: "uppercase",
                 letterSpacing: "0.04em",
               }}
             >
               {["Name", "Phone", "Email", "Last visit", "Registered", ""].map((h) => (
-                <th key={h} style={{ textAlign: "left", padding: "14px 18px", fontWeight: 600 }}>
+                <th key={h} style={{ textAlign: "left", padding: "12px 18px", fontWeight: 600 }}>
                   {h}
                 </th>
               ))}
@@ -199,8 +190,8 @@ export default async function PatientsPage({
               const pid = String(patient._id)
               const lastVisit = lastVisitMap[pid]
               return (
-                <tr key={pid} style={{ borderBottom: "1px solid rgba(23,42,58,0.06)" }}>
-                  <td style={{ padding: "14px 18px", fontWeight: 600 }}>
+                <tr key={pid} style={{ borderBottom: "1px solid var(--admin-border)" }}>
+                  <td data-label="Name" style={{ padding: "14px 18px", fontWeight: 600 }}>
                     {patient.alerts && (
                       <span title="Has alerts" style={{ color: "#c0392b", marginRight: 6 }}>
                         ⚠
@@ -208,29 +199,29 @@ export default async function PatientsPage({
                     )}
                     {patient.name}
                   </td>
-                  <td style={{ padding: "14px 18px" }}>{patient.phone}</td>
-                  <td style={{ padding: "14px 18px", color: "var(--color-text-muted)" }}>
+                  <td data-label="Phone" style={{ padding: "14px 18px" }}>{patient.phone}</td>
+                  <td data-label="Email" style={{ padding: "14px 18px", color: "var(--admin-muted)" }}>
                     {patient.email ?? "—"}
                   </td>
-                  <td style={{ padding: "14px 18px", color: "var(--color-text-muted)" }}>
+                  <td data-label="Last visit" style={{ padding: "14px 18px", color: "var(--admin-muted)" }}>
                     {lastVisit ? formatDate(lastVisit) : "—"}
                   </td>
-                  <td style={{ padding: "14px 18px", color: "var(--color-text-muted)" }}>
+                  <td data-label="Registered" style={{ padding: "14px 18px", color: "var(--admin-muted)" }}>
                     {formatDate(patient.createdAt as Date)}
                   </td>
-                  <td style={{ padding: "14px 18px" }}>
+                  <td data-label="" style={{ padding: "14px 18px" }}>
                     {showDeleted ? (
                       <form action={restorePatient.bind(null, pid)} style={{ display: "inline" }}>
                         <button
                           type="submit"
                           style={{
                             padding: "7px 14px",
-                            borderRadius: 7,
-                            background: "var(--color-surface)",
+                            borderRadius: 8,
+                            background: "var(--admin-card)",
+                            border: "1px solid var(--admin-border)",
                             color: "var(--color-brand)",
                             fontSize: 14,
                             fontWeight: 600,
-                            border: "none",
                             cursor: "pointer",
                           }}
                         >
@@ -242,8 +233,9 @@ export default async function PatientsPage({
                         href={`/admin/patients/${pid}`}
                         style={{
                           padding: "7px 14px",
-                          borderRadius: 7,
-                          background: "var(--color-surface)",
+                          borderRadius: 8,
+                          background: "var(--admin-card)",
+                          border: "1px solid var(--admin-border)",
                           color: "var(--color-brand)",
                           fontSize: 14,
                           fontWeight: 600,

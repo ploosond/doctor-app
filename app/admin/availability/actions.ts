@@ -1,6 +1,7 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
+import { redirect } from "next/navigation"
 import { saveAvailability, type WorkingHour } from "@/lib/services/availability"
 import { requireSession } from "@/lib/auth-guard"
 
@@ -24,4 +25,5 @@ export async function updateAvailability(fd: FormData) {
 
   await saveAvailability({ workingHours, slotDurationMins, bufferMins, blockedDates })
   revalidatePath("/admin/availability")
+  redirect("/admin/availability?flash=saved")
 }

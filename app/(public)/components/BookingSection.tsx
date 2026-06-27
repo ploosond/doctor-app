@@ -4,8 +4,12 @@ import { useState, useRef, useEffect } from "react"
 import { useLang } from "@/lib/i18n"
 import { Check, ChevronRight, ChevronLeft, Clock } from "lucide-react"
 import type { ServiceCardData } from "./ServicesSection"
-import { getSlots, getNextAvailable, submitBooking, type PublicSlot } from "../actions"
-import { demoImage } from "@/lib/demo-image"
+import {
+  getSlots,
+  getNextAvailable,
+  submitBooking,
+  type PublicSlot,
+} from "../actions"
 
 const FORM_ACCENT = "var(--color-accent)"
 const FORM_ACCENT_FILL = "var(--color-surface)"
@@ -288,7 +292,7 @@ export function BookingSection({ services }: { services: ServiceCardData[] }) {
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={demoImage("samples/people/smiling-man", 640, 820)}
+              src={"/booking/booking.jpeg"}
               alt=''
               style={{
                 position: "absolute",
@@ -500,276 +504,286 @@ export function BookingSection({ services }: { services: ServiceCardData[] }) {
                     }}
                   >
                     {b.no_availability}{" "}
-                    <a href='#contact' style={{ color: FORM_ACCENT, fontWeight: 600 }}>
+                    <a
+                      href='#contact'
+                      style={{ color: FORM_ACCENT, fontWeight: 600 }}
+                    >
                       {t.call_today}
                     </a>
                   </p>
                 ) : (
                   <>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    gap: 12,
-                    marginBottom: 14,
-                  }}
-                >
-                  <div style={labelStyle}>{b.select_datetime}</div>
-                  <span
-                    style={{
-                      fontSize: 14,
-                      fontWeight: 700,
-                      color: "var(--color-text)",
-                    }}
-                  >
-                    {monthYear}
-                  </span>
-                </div>
-
-                {/* Day strip */}
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "stretch",
-                    gap: 4,
-                    marginBottom: 18,
-                  }}
-                >
-                  <button
-                    type='button'
-                    aria-label='Previous week'
-                    disabled={prevDisabled}
-                    onClick={() => setWindowStart(addDays(windowStart, -7))}
-                    style={{
-                      background: "none",
-                      border: "none",
-                      cursor: prevDisabled ? "not-allowed" : "pointer",
-                      opacity: prevDisabled ? 0.35 : 1,
-                      color: "var(--color-text-muted)",
-                      padding: "0 2px",
-                    }}
-                  >
-                    <ChevronLeft size={18} />
-                  </button>
-                  <div
-                    style={{
-                      flex: 1,
-                      display: "grid",
-                      gridTemplateColumns: "repeat(7, 1fr)",
-                      gap: 2,
-                    }}
-                  >
-                    {stripDays.map((iso) => {
-                      const isActive = iso === date
-                      const isPast = iso < today
-                      return (
-                        <button
-                          key={iso}
-                          type='button'
-                          disabled={isPast}
-                          onClick={() => !isPast && onDateChange(iso)}
-                          style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "center",
-                            gap: 4,
-                            padding: "8px 2px 10px",
-                            background: "none",
-                            border: "none",
-                            borderBottom: `2px solid ${isActive ? FORM_ACCENT : "transparent"}`,
-                            cursor: isPast ? "not-allowed" : "pointer",
-                            opacity: isPast ? 0.3 : 1,
-                          }}
-                        >
-                          <span
-                            style={{
-                              fontSize: 12,
-                              fontWeight: 600,
-                              color: isActive
-                                ? "var(--color-text)"
-                                : "var(--color-text-muted)",
-                            }}
-                          >
-                            {dayName(iso)}
-                          </span>
-                          <span
-                            style={{
-                              fontSize: 20,
-                              fontWeight: isActive ? 800 : 600,
-                              color: isActive
-                                ? "var(--color-text)"
-                                : "var(--color-text-muted)",
-                            }}
-                          >
-                            {dateParts(iso).getDate()}
-                          </span>
-                        </button>
-                      )
-                    })}
-                  </div>
-                  <button
-                    type='button'
-                    aria-label='Next week'
-                    onClick={() => setWindowStart(addDays(windowStart, 7))}
-                    style={{
-                      background: "none",
-                      border: "none",
-                      cursor: "pointer",
-                      color: "var(--color-text-muted)",
-                      padding: "0 2px",
-                    }}
-                  >
-                    <ChevronRight size={18} />
-                  </button>
-                </div>
-
-                {error && (
-                  <p
-                    style={{
-                      color: "#c0392b",
-                      fontSize: 14,
-                      margin: "0 0 12px",
-                    }}
-                  >
-                    {error}
-                  </p>
-                )}
-
-                {/* Time grid */}
-                {loadingSlots ? (
-                  <p
-                    style={{
-                      color: "var(--color-text-muted)",
-                      fontSize: 15,
-                      margin: 0,
-                    }}
-                  >
-                    {b.loading_slots}
-                  </p>
-                ) : slots.length === 0 ? (
-                  <div>
-                    <p
-                      style={{
-                        color: "var(--color-text-muted)",
-                        fontSize: 15,
-                        margin: "0 0 10px",
-                      }}
-                    >
-                      {b.no_slots_day}
-                    </p>
-                    <button
-                      type='button'
-                      onClick={() => jumpToNextAvailable(addDays(date, 1))}
-                      style={{
-                        background: "none",
-                        border: "none",
-                        padding: 0,
-                        cursor: "pointer",
-                        fontSize: 15,
-                        fontWeight: 700,
-                        color: FORM_ACCENT,
-                      }}
-                    >
-                      {b.next_available} →
-                    </button>
-                  </div>
-                ) : (
-                  <>
                     <div
                       style={{
-                        display: "grid",
-                        gridTemplateColumns:
-                          "repeat(auto-fill, minmax(84px, 1fr))",
-                        gap: 10,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: 12,
+                        marginBottom: 14,
                       }}
                     >
-                      {visibleSlots.map((s) => {
-                        const selected = slot?.startISO === s.startISO
-                        return (
-                          <button
-                            key={s.startISO}
-                            type='button'
-                            onClick={() => setSlot(s)}
-                            style={{
-                              padding: "12px 8px",
-                              borderRadius: 12,
-                              border: `1.5px solid ${selected ? FORM_ACCENT : "var(--color-accent)"}`,
-                              background: selected ? FORM_ACCENT : "#fff",
-                              color: selected ? "#fff" : "var(--color-text)",
-                              fontSize: 15,
-                              fontWeight: 600,
-                              cursor: "pointer",
-                            }}
-                          >
-                            {s.startLabel}
-                          </button>
-                        )
-                      })}
-                    </div>
-                    {remainingSlots > 0 && (
-                      <button
-                        type='button'
-                        onClick={() => setShowAllSlots(true)}
-                        style={{
-                          background: "none",
-                          border: "none",
-                          padding: "14px 0 0",
-                          cursor: "pointer",
-                          fontSize: 15,
-                          fontWeight: 700,
-                          color: FORM_ACCENT,
-                        }}
-                      >
-                        {b.show_more}{" "}
-                        <span
-                          style={{
-                            color: "var(--color-text-muted)",
-                            fontWeight: 500,
-                          }}
-                        >
-                          ({remainingSlots} {b.available})
-                        </span>
-                      </button>
-                    )}
-                  </>
-                )}
-
-                {/* Selected banner */}
-                {slot && (
-                  <div
-                    style={{
-                      marginTop: 20,
-                      padding: "16px 20px",
-                      borderRadius: 16,
-                      background: `linear-gradient(120deg, var(--color-surface), ${FORM_ACCENT_FILL})`,
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: 14,
-                        color: "var(--color-text-muted)",
-                        marginBottom: 6,
-                      }}
-                    >
-                      {b.selected}
-                    </div>
-                    <div
-                      style={{ display: "flex", alignItems: "center", gap: 10 }}
-                    >
-                      <Clock size={18} color={FORM_ACCENT} />
+                      <div style={labelStyle}>{b.select_datetime}</div>
                       <span
                         style={{
-                          fontSize: 17,
+                          fontSize: 14,
                           fontWeight: 700,
                           color: "var(--color-text)",
                         }}
                       >
-                        {selectedDateLabel}, {slot.startLabel} - {slot.endLabel}
+                        {monthYear}
                       </span>
                     </div>
-                  </div>
-                )}
+
+                    {/* Day strip */}
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "stretch",
+                        gap: 4,
+                        marginBottom: 18,
+                      }}
+                    >
+                      <button
+                        type='button'
+                        aria-label='Previous week'
+                        disabled={prevDisabled}
+                        onClick={() => setWindowStart(addDays(windowStart, -7))}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          cursor: prevDisabled ? "not-allowed" : "pointer",
+                          opacity: prevDisabled ? 0.35 : 1,
+                          color: "var(--color-text-muted)",
+                          padding: "0 2px",
+                        }}
+                      >
+                        <ChevronLeft size={18} />
+                      </button>
+                      <div
+                        style={{
+                          flex: 1,
+                          display: "grid",
+                          gridTemplateColumns: "repeat(7, 1fr)",
+                          gap: 2,
+                        }}
+                      >
+                        {stripDays.map((iso) => {
+                          const isActive = iso === date
+                          const isPast = iso < today
+                          return (
+                            <button
+                              key={iso}
+                              type='button'
+                              disabled={isPast}
+                              onClick={() => !isPast && onDateChange(iso)}
+                              style={{
+                                display: "flex",
+                                flexDirection: "column",
+                                alignItems: "center",
+                                gap: 4,
+                                padding: "8px 2px 10px",
+                                background: "none",
+                                border: "none",
+                                borderBottom: `2px solid ${isActive ? FORM_ACCENT : "transparent"}`,
+                                cursor: isPast ? "not-allowed" : "pointer",
+                                opacity: isPast ? 0.3 : 1,
+                              }}
+                            >
+                              <span
+                                style={{
+                                  fontSize: 12,
+                                  fontWeight: 600,
+                                  color: isActive
+                                    ? "var(--color-text)"
+                                    : "var(--color-text-muted)",
+                                }}
+                              >
+                                {dayName(iso)}
+                              </span>
+                              <span
+                                style={{
+                                  fontSize: 20,
+                                  fontWeight: isActive ? 800 : 600,
+                                  color: isActive
+                                    ? "var(--color-text)"
+                                    : "var(--color-text-muted)",
+                                }}
+                              >
+                                {dateParts(iso).getDate()}
+                              </span>
+                            </button>
+                          )
+                        })}
+                      </div>
+                      <button
+                        type='button'
+                        aria-label='Next week'
+                        onClick={() => setWindowStart(addDays(windowStart, 7))}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          cursor: "pointer",
+                          color: "var(--color-text-muted)",
+                          padding: "0 2px",
+                        }}
+                      >
+                        <ChevronRight size={18} />
+                      </button>
+                    </div>
+
+                    {error && (
+                      <p
+                        style={{
+                          color: "#c0392b",
+                          fontSize: 14,
+                          margin: "0 0 12px",
+                        }}
+                      >
+                        {error}
+                      </p>
+                    )}
+
+                    {/* Time grid */}
+                    {loadingSlots ? (
+                      <p
+                        style={{
+                          color: "var(--color-text-muted)",
+                          fontSize: 15,
+                          margin: 0,
+                        }}
+                      >
+                        {b.loading_slots}
+                      </p>
+                    ) : slots.length === 0 ? (
+                      <div>
+                        <p
+                          style={{
+                            color: "var(--color-text-muted)",
+                            fontSize: 15,
+                            margin: "0 0 10px",
+                          }}
+                        >
+                          {b.no_slots_day}
+                        </p>
+                        <button
+                          type='button'
+                          onClick={() => jumpToNextAvailable(addDays(date, 1))}
+                          style={{
+                            background: "none",
+                            border: "none",
+                            padding: 0,
+                            cursor: "pointer",
+                            fontSize: 15,
+                            fontWeight: 700,
+                            color: FORM_ACCENT,
+                          }}
+                        >
+                          {b.next_available} →
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        <div
+                          style={{
+                            display: "grid",
+                            gridTemplateColumns:
+                              "repeat(auto-fill, minmax(84px, 1fr))",
+                            gap: 10,
+                          }}
+                        >
+                          {visibleSlots.map((s) => {
+                            const selected = slot?.startISO === s.startISO
+                            return (
+                              <button
+                                key={s.startISO}
+                                type='button'
+                                onClick={() => setSlot(s)}
+                                style={{
+                                  padding: "12px 8px",
+                                  borderRadius: 12,
+                                  border: `1.5px solid ${selected ? FORM_ACCENT : "var(--color-accent)"}`,
+                                  background: selected ? FORM_ACCENT : "#fff",
+                                  color: selected
+                                    ? "#fff"
+                                    : "var(--color-text)",
+                                  fontSize: 15,
+                                  fontWeight: 600,
+                                  cursor: "pointer",
+                                }}
+                              >
+                                {s.startLabel}
+                              </button>
+                            )
+                          })}
+                        </div>
+                        {remainingSlots > 0 && (
+                          <button
+                            type='button'
+                            onClick={() => setShowAllSlots(true)}
+                            style={{
+                              background: "none",
+                              border: "none",
+                              padding: "14px 0 0",
+                              cursor: "pointer",
+                              fontSize: 15,
+                              fontWeight: 700,
+                              color: FORM_ACCENT,
+                            }}
+                          >
+                            {b.show_more}{" "}
+                            <span
+                              style={{
+                                color: "var(--color-text-muted)",
+                                fontWeight: 500,
+                              }}
+                            >
+                              ({remainingSlots} {b.available})
+                            </span>
+                          </button>
+                        )}
+                      </>
+                    )}
+
+                    {/* Selected banner */}
+                    {slot && (
+                      <div
+                        style={{
+                          marginTop: 20,
+                          padding: "16px 20px",
+                          borderRadius: 16,
+                          background: `linear-gradient(120deg, var(--color-surface), ${FORM_ACCENT_FILL})`,
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontSize: 14,
+                            color: "var(--color-text-muted)",
+                            marginBottom: 6,
+                          }}
+                        >
+                          {b.selected}
+                        </div>
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 10,
+                          }}
+                        >
+                          <Clock size={18} color={FORM_ACCENT} />
+                          <span
+                            style={{
+                              fontSize: 17,
+                              fontWeight: 700,
+                              color: "var(--color-text)",
+                            }}
+                          >
+                            {selectedDateLabel}, {slot.startLabel} -{" "}
+                            {slot.endLabel}
+                          </span>
+                        </div>
+                      </div>
+                    )}
                   </>
                 )}
               </div>
@@ -822,10 +836,10 @@ export function BookingSection({ services }: { services: ServiceCardData[] }) {
                     <label>
                       Company
                       <input
-                        type="text"
-                        name="company"
+                        type='text'
+                        name='company'
                         tabIndex={-1}
-                        autoComplete="off"
+                        autoComplete='off'
                         value={hp}
                         onChange={(e) => setHp(e.target.value)}
                       />

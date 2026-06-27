@@ -1,6 +1,8 @@
 "use client"
 
 import { useState } from "react"
+import { SubmitButton } from "@/app/admin/components/SubmitButton"
+import { inputStyle, labelStyle } from "@/app/admin/ui"
 
 export type VisitInitial = {
   visitDate?: string // yyyy-mm-dd
@@ -8,28 +10,6 @@ export type VisitInitial = {
   diagnosis?: string
   medication?: string
   followUpDate?: string // yyyy-mm-dd
-}
-
-const inputStyle = {
-  width: "100%",
-  padding: "10px 13px",
-  borderRadius: 8,
-  border: "1.5px solid var(--color-accent)",
-  fontSize: 16,
-  color: "var(--color-text)",
-  boxSizing: "border-box" as const,
-  fontFamily: "var(--font-sans), sans-serif",
-  background: "#fff",
-}
-
-const labelStyle = {
-  display: "block",
-  fontSize: 13,
-  fontWeight: 700,
-  color: "var(--color-text-muted)",
-  textTransform: "uppercase" as const,
-  letterSpacing: "0.04em",
-  marginBottom: 5,
 }
 
 const todayInput = () => new Date().toISOString().slice(0, 10)
@@ -87,7 +67,7 @@ export function VisitForm({
           color: isEdit ? "var(--color-brand)" : "#fff",
           fontSize: isEdit ? 14 : 15,
           fontWeight: 600,
-          border: isEdit ? "1.5px solid var(--color-accent)" : "none",
+          border: isEdit ? "1px solid var(--admin-border)" : "none",
           cursor: "pointer",
         }}
       >
@@ -98,20 +78,18 @@ export function VisitForm({
 
   return (
     <form
-      action={async (fd) => {
-        await action(fd)
-        setOpen(false)
-      }}
+      action={action}
       style={{
-        background: "var(--color-surface)",
-        borderRadius: 10,
+        background: "#FAFBFC",
+        border: "1px solid var(--admin-border)",
+        borderRadius: 12,
         padding: "16px 18px",
         marginTop: isEdit ? 12 : 0,
       }}
     >
       {hidden &&
         Object.entries(hidden).map(([k, v]) => <input key={k} type="hidden" name={k} value={v} />)}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
+      <div className="admin-grid-2" style={{ gap: 12, marginBottom: 12 }}>
         <div>
           <label style={labelStyle}>Visit date</label>
           <input name="visitDate" type="date" defaultValue={initialData?.visitDate ?? prefillDate ?? todayInput()} style={inputStyle} />
@@ -131,7 +109,7 @@ export function VisitForm({
           style={{ ...inputStyle, resize: "vertical" }}
         />
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 14 }}>
+      <div className="admin-grid-2" style={{ gap: 12, marginBottom: 14 }}>
         <div>
           <label style={labelStyle}>Diagnosis</label>
           <input name="diagnosis" type="text" defaultValue={initialData?.diagnosis ?? ""} placeholder="Working diagnosis" style={inputStyle} />
@@ -142,8 +120,8 @@ export function VisitForm({
         </div>
       </div>
       <div style={{ display: "flex", gap: 10 }}>
-        <button
-          type="submit"
+        <SubmitButton
+          label={isEdit ? "Save changes" : "Save visit"}
           style={{
             padding: "9px 20px",
             borderRadius: 8,
@@ -152,11 +130,8 @@ export function VisitForm({
             fontSize: 15,
             fontWeight: 600,
             border: "none",
-            cursor: "pointer",
           }}
-        >
-          {isEdit ? "Save changes" : "Save visit"}
-        </button>
+        />
         <button
           type="button"
           onClick={() => setOpen(false)}
@@ -164,10 +139,10 @@ export function VisitForm({
             padding: "9px 18px",
             borderRadius: 8,
             background: "transparent",
-            color: "var(--color-text-muted)",
+            color: "var(--admin-muted)",
             fontSize: 15,
             fontWeight: 500,
-            border: "1.5px solid var(--color-accent)",
+            border: "1px solid var(--admin-border)",
             cursor: "pointer",
           }}
         >

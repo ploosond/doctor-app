@@ -1,6 +1,7 @@
 import { listAppointments } from "@/lib/services/appointments"
 import Link from "next/link"
 import { updateAppointmentStatus } from "./actions"
+import { FlashBanner } from "../components/FlashBanner"
 
 const STATUS_LABEL: Record<string, string> = {
   requested: "Pending",
@@ -31,38 +32,23 @@ function formatDate(d: Date) {
 export default async function AppointmentsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string }>
+  searchParams: Promise<{ status?: string; flash?: string }>
 }) {
-  const { status } = await searchParams
+  const { status, flash } = await searchParams
   const appointments = await listAppointments({ status })
 
   return (
-    <div style={{ padding: "36px 40px" }}>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: 28,
-        }}
-      >
-        <h1
-          style={{
-            fontFamily: "var(--font-heading), serif",
-            fontWeight: 500,
-            fontSize: 28,
-            letterSpacing: "-0.01em",
-            color: "var(--color-text)",
-            margin: 0,
-          }}
-        >
+    <div className="admin-page">
+      <FlashBanner code={flash} />
+      <div className="admin-page-head">
+        <h1 className="admin-h1" style={{ margin: 0 }}>
           Appointments
         </h1>
         <Link
           href="/admin/appointments/new"
           style={{
-            padding: "11px 22px",
-            borderRadius: 10,
+            padding: "10px 20px",
+            borderRadius: 8,
             background: "var(--color-brand)",
             color: "#fff",
             fontSize: 15,
@@ -88,15 +74,15 @@ export default async function AppointmentsPage({
             key={val}
             href={val ? `/admin/appointments?status=${val}` : "/admin/appointments"}
             style={{
-              padding: "8px 16px",
-              borderRadius: 999,
-              fontSize: 15,
+              padding: "7px 16px",
+              borderRadius: 8,
+              fontSize: 14,
               fontWeight: 600,
               textDecoration: "none",
-              border: "1.5px solid",
-              borderColor: status === val || (!val && !status) ? "var(--color-brand)" : "var(--color-accent)",
-              background: status === val || (!val && !status) ? "var(--color-brand)" : "transparent",
-              color: status === val || (!val && !status) ? "#fff" : "var(--color-text-muted)",
+              border: "1px solid",
+              borderColor: status === val || (!val && !status) ? "var(--color-brand)" : "var(--admin-border)",
+              background: status === val || (!val && !status) ? "var(--color-brand)" : "var(--admin-card)",
+              color: status === val || (!val && !status) ? "#fff" : "var(--admin-muted)",
             }}
           >
             {label}
@@ -109,9 +95,10 @@ export default async function AppointmentsPage({
           style={{
             padding: "60px",
             textAlign: "center",
-            color: "var(--color-text-muted)",
-            fontSize: 16,
-            background: "var(--color-surface)",
+            color: "var(--admin-muted)",
+            fontSize: 15,
+            background: "var(--admin-card)",
+            border: "1px solid var(--admin-border)",
             borderRadius: 12,
           }}
         >
@@ -119,30 +106,31 @@ export default async function AppointmentsPage({
         </div>
       ) : (
         <table
+          className="admin-table"
           style={{
-            width: "100%",
-            borderCollapse: "collapse",
-            fontSize: 16,
+            fontSize: 15,
             color: "var(--color-text)",
-            background: "#fff",
-            borderRadius: 14,
+            background: "var(--admin-card)",
+            border: "1px solid var(--admin-border)",
+            borderRadius: 12,
             overflow: "hidden",
-            boxShadow: "0 2px 8px rgba(23,42,58,0.06)",
+            boxShadow: "var(--admin-shadow)",
           }}
         >
           <thead>
             <tr
               style={{
-                background: "var(--color-surface)",
-                color: "var(--color-text-muted)",
-                fontSize: 14,
+                background: "#FAFBFC",
+                borderBottom: "1px solid var(--admin-border)",
+                color: "var(--admin-muted)",
+                fontSize: 12.5,
                 fontWeight: 600,
                 textTransform: "uppercase",
                 letterSpacing: "0.04em",
               }}
             >
               {["Patient", "Service", "Mode", "Date / Time", "Status", "Actions"].map((h) => (
-                <th key={h} style={{ textAlign: "left", padding: "14px 18px", fontWeight: 600 }}>
+                <th key={h} style={{ textAlign: "left", padding: "12px 18px", fontWeight: 600 }}>
                   {h}
                 </th>
               ))}
@@ -153,25 +141,25 @@ export default async function AppointmentsPage({
               const patient = appt.patientRef as unknown as { _id: string; name: string; phone: string }
               const apptId = String(appt._id)
               return (
-                <tr key={apptId} style={{ borderBottom: "1px solid rgba(23,42,58,0.06)" }}>
-                  <td style={{ padding: "14px 18px" }}>
+                <tr key={apptId} style={{ borderBottom: "1px solid var(--admin-border)" }}>
+                  <td data-label="Patient" style={{ padding: "14px 18px" }}>
                     <div style={{ fontWeight: 600 }}>{patient?.name ?? "—"}</div>
-                    <div style={{ fontSize: 14, color: "var(--color-text-muted)" }}>{patient?.phone}</div>
+                    <div style={{ fontSize: 13, color: "var(--admin-muted)" }}>{patient?.phone}</div>
                   </td>
-                  <td style={{ padding: "14px 18px", textTransform: "capitalize" }}>{appt.service}</td>
-                  <td style={{ padding: "14px 18px", textTransform: "capitalize" }}>
+                  <td data-label="Service" style={{ padding: "14px 18px", textTransform: "capitalize" }}>{appt.service}</td>
+                  <td data-label="Mode" style={{ padding: "14px 18px", textTransform: "capitalize" }}>
                     {(appt.mode as string).replace("_", " ")}
                   </td>
-                  <td style={{ padding: "14px 18px", color: "var(--color-text-muted)" }}>
+                  <td data-label="Date / Time" style={{ padding: "14px 18px", color: "var(--admin-muted)" }}>
                     {formatDate(appt.slotStart as Date)}
                   </td>
-                  <td style={{ padding: "14px 18px" }}>
+                  <td data-label="Status" style={{ padding: "14px 18px" }}>
                     <span
                       style={{
                         display: "inline-block",
-                        padding: "5px 12px",
-                        borderRadius: 999,
-                        fontSize: 14,
+                        padding: "4px 10px",
+                        borderRadius: 6,
+                        fontSize: 13,
                         fontWeight: 600,
                         background: `${STATUS_COLOR[appt.status as string]}18`,
                         color: STATUS_COLOR[appt.status as string],
@@ -180,8 +168,8 @@ export default async function AppointmentsPage({
                       {STATUS_LABEL[appt.status as string] ?? appt.status}
                     </span>
                   </td>
-                  <td style={{ padding: "14px 18px" }}>
-                    <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                  <td data-label="" style={{ padding: "14px 18px" }}>
+                    <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
                       {appt.status === "requested" && (
                         <form
                           action={async () => {
@@ -258,9 +246,10 @@ export default async function AppointmentsPage({
                         href={`/admin/appointments/${apptId}`}
                         style={{
                           padding: "7px 14px",
-                          borderRadius: 7,
-                          background: "var(--color-surface)",
-                          color: "var(--color-text-muted)",
+                          borderRadius: 8,
+                          background: "var(--admin-card)",
+                          border: "1px solid var(--admin-border)",
+                          color: "var(--color-text)",
                           fontSize: 14,
                           fontWeight: 600,
                           textDecoration: "none",

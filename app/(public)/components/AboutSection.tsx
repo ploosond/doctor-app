@@ -1,29 +1,33 @@
-"use client";
+"use client"
 
-import { useLang } from "@/lib/i18n";
-import { Check, ArrowRight } from "lucide-react";
-import { demoImage } from "@/lib/demo-image";
+import { useLang } from "@/lib/i18n"
+import { Check, ArrowRight } from "lucide-react"
 
-const CHECKS = [
-  "chk1", "chk2", "chk3", "chk4", "chk5", "chk6",
-] as const;
+const CHECKS = ["chk1", "chk2", "chk3", "chk4", "chk5", "chk6"] as const
 
 export function AboutSection() {
-  const { t } = useLang();
+  const { t } = useLang()
 
   return (
     <section
-      id="about"
-      style={{ width: "100%", background: "var(--color-surface)", margin: 0, padding: 0, overflow: "hidden" }}
+      id='about'
+      style={{
+        width: "100%",
+        background: "var(--color-surface)",
+        margin: 0,
+        padding: 0,
+        overflow: "hidden",
+      }}
     >
-      <div className="section-inner grid-about">
+      <div className='section-inner grid-about'>
         {/* Left */}
         <div
           style={{
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
-            padding: "clamp(36px,8vw,72px) 0 clamp(36px,8vw,72px) clamp(16px,4vw,28px)",
+            padding:
+              "clamp(36px,8vw,72px) 0 clamp(36px,8vw,72px) clamp(16px,4vw,28px)",
           }}
         >
           <h2
@@ -77,9 +81,9 @@ export function AboutSection() {
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            className="about-photo"
-            src={demoImage("samples/people/jazz", 420, 520)}
-            alt="Dr. Lila"
+            className='about-photo'
+            src={"/about/doctor.jpeg"}
+            alt='Dr. Lila'
           />
         </div>
 
@@ -89,7 +93,8 @@ export function AboutSection() {
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
-            padding: "clamp(36px,8vw,72px) clamp(16px,4vw,28px) clamp(36px,8vw,72px) 0",
+            padding:
+              "clamp(36px,8vw,72px) clamp(16px,4vw,28px) clamp(36px,8vw,72px) 0",
           }}
         >
           <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
@@ -101,10 +106,16 @@ export function AboutSection() {
                 <Check
                   size={18}
                   strokeWidth={2.4}
-                  color="var(--color-brand)"
+                  color='var(--color-brand)'
                   style={{ marginTop: 2, flexShrink: 0 }}
                 />
-                <span style={{ fontSize: 16, color: "var(--color-text)", lineHeight: 1.4 }}>
+                <span
+                  style={{
+                    fontSize: 16,
+                    color: "var(--color-text)",
+                    lineHeight: 1.4,
+                  }}
+                >
                   {t[key]}
                 </span>
               </div>
@@ -123,7 +134,13 @@ export function AboutSection() {
             >
               DR. LILA, MRCPsych
             </div>
-            <div style={{ fontSize: 14, color: "var(--color-text-muted)", marginTop: 3 }}>
+            <div
+              style={{
+                fontSize: 14,
+                color: "var(--color-text-muted)",
+                marginTop: 3,
+              }}
+            >
               {t.sig_role}
             </div>
           </div>
@@ -131,7 +148,7 @@ export function AboutSection() {
       </div>
 
       {/* Where I practice strip */}
-      <div className="section-container" style={{ paddingBottom: 64 }}>
+      <div className='section-container' style={{ paddingBottom: 64 }}>
         <div
           style={{
             borderTop: "1px solid rgba(23,42,58,0.14)",
@@ -162,11 +179,11 @@ export function AboutSection() {
           >
             {t.practice_head}
           </div>
-          <div className="grid-3col" style={{ gap: 20 }}>
+          <div className='grid-3col' style={{ gap: 20 }}>
             {t.clinics.map((clinic) => (
               <div
                 key={clinic.name}
-                className="svc-card"
+                className='svc-card'
                 style={{
                   background: "#fff",
                   borderRadius: 16,
@@ -179,16 +196,29 @@ export function AboutSection() {
                 {/* Map embed */}
                 <iframe
                   src={`https://maps.google.com/maps?q=${encodeURIComponent(clinic.address)}&output=embed`}
-                  width="100%"
-                  height="160"
-                  style={{ display: "block", border: "none", width: "100%", flex: 1, minHeight: 170 }}
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
+                  width='100%'
+                  height='160'
+                  style={{
+                    display: "block",
+                    border: "none",
+                    width: "100%",
+                    flex: 1,
+                    minHeight: 170,
+                  }}
+                  loading='lazy'
+                  referrerPolicy='no-referrer-when-downgrade'
                   title={clinic.name}
                 />
                 {/* Info */}
                 <div style={{ padding: "16px 18px 18px" }}>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      gap: 12,
+                    }}
+                  >
                     <div>
                       <div
                         style={{
@@ -201,18 +231,27 @@ export function AboutSection() {
                       >
                         {clinic.name}
                       </div>
-                      <div style={{ fontSize: 13, color: "var(--color-text-muted)" }}>
+                      <div
+                        style={{
+                          fontSize: 13,
+                          color: "var(--color-text-muted)",
+                        }}
+                      >
                         {clinic.address}
                       </div>
                     </div>
                     <a
                       href={`https://maps.google.com/maps?q=${encodeURIComponent(clinic.address)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="svc-arrow"
+                      target='_blank'
+                      rel='noopener noreferrer'
+                      className='svc-arrow'
                       style={{ flexShrink: 0, textDecoration: "none" }}
                     >
-                      <ArrowRight size={20} strokeWidth={2.2} color="var(--color-brand)" />
+                      <ArrowRight
+                        size={20}
+                        strokeWidth={2.2}
+                        color='var(--color-brand)'
+                      />
                     </a>
                   </div>
                 </div>
@@ -222,5 +261,5 @@ export function AboutSection() {
         </div>
       </div>
     </section>
-  );
+  )
 }

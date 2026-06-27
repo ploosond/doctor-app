@@ -12,25 +12,16 @@ export default async function EditServicePage({ params }: { params: Promise<{ sl
   const action = updateService.bind(null, slug)
 
   return (
-    <div style={{ padding: "36px 40px", maxWidth: 860 }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28 }}>
-        <h1
-          style={{
-            fontFamily: "var(--font-heading), serif",
-            fontWeight: 500,
-            fontSize: 28,
-            letterSpacing: "-0.01em",
-            color: "var(--color-text)",
-            margin: 0,
-          }}
-        >
+    <div className="admin-page" style={{ maxWidth: 800 }}>
+      <div className="admin-page-head">
+        <h1 className="admin-h1" style={{ margin: 0 }}>
           Edit service
         </h1>
         <Link
           href="/admin/services"
           style={{
-            fontSize: 13,
-            color: "var(--color-text-muted)",
+            fontSize: 15,
+            color: "var(--admin-muted)",
             textDecoration: "none",
             fontWeight: 500,
           }}

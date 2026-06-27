@@ -127,9 +127,14 @@ export async function deleteAppointment(id: string): Promise<void> {
   await AppointmentModel.findByIdAndDelete(id)
 }
 
-export async function setStatus(id: string, status: string): Promise<void> {
+export async function setStatus(
+  id: string,
+  status: string,
+  opts?: { silent?: boolean },
+): Promise<void> {
   await connectDB()
   await AppointmentModel.findByIdAndUpdate(id, { status })
+  if (opts?.silent) return
   if (status === "confirmed") await notifyConfirmed(id)
   else if (status === "cancelled") await notifyCancelled(id)
 }

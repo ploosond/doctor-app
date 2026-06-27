@@ -48,7 +48,7 @@ export async function createPatient(fd: FormData) {
   await requireSession()
   const id = await patients.createPatient(patientFields(fd))
   revalidatePath("/admin/patients")
-  redirect(`/admin/patients/${id}`)
+  redirect(`/admin/patients/${id}?flash=created`)
 }
 
 export async function updatePatient(id: string, fd: FormData) {
@@ -56,26 +56,28 @@ export async function updatePatient(id: string, fd: FormData) {
   await patients.updatePatient(id, patientFields(fd))
   revalidatePath("/admin/patients")
   revalidatePath(`/admin/patients/${id}`)
-  redirect(`/admin/patients/${id}`)
+  redirect(`/admin/patients/${id}?flash=updated`)
 }
 
 export async function deletePatient(id: string) {
   await requireSession()
   await patients.softDeletePatient(id)
   revalidatePath("/admin/patients")
-  redirect("/admin/patients")
+  redirect("/admin/patients?flash=deleted")
 }
 
 export async function restorePatient(id: string) {
   await requireSession()
   await patients.restorePatient(id)
   revalidatePath("/admin/patients")
+  redirect("/admin/patients?flash=restored")
 }
 
 export async function updatePatientNotes(id: string, notes: string) {
   await requireSession()
   await patients.setPatientNotes(id, notes)
   revalidatePath(`/admin/patients/${id}`)
+  redirect(`/admin/patients/${id}?flash=notes`)
 }
 
 export async function addVisit(patientId: string, fd: FormData) {
@@ -84,16 +86,19 @@ export async function addVisit(patientId: string, fd: FormData) {
   await patients.addVisit(patientId, fields)
   revalidatePath(`/admin/patients/${patientId}`)
   if (fields.appointmentRef) revalidatePath(`/admin/appointments/${fields.appointmentRef}`)
+  redirect(`/admin/patients/${patientId}?flash=visit_added`)
 }
 
 export async function updateVisit(visitId: string, patientId: string, fd: FormData) {
   await requireSession()
   await patients.updateVisit(visitId, visitFields(fd))
   revalidatePath(`/admin/patients/${patientId}`)
+  redirect(`/admin/patients/${patientId}?flash=visit_updated`)
 }
 
 export async function deleteVisit(visitId: string, patientId: string) {
   await requireSession()
   await patients.deleteVisit(visitId)
   revalidatePath(`/admin/patients/${patientId}`)
+  redirect(`/admin/patients/${patientId}?flash=visit_deleted`)
 }

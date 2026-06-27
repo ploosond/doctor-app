@@ -2,18 +2,8 @@ export const dynamic = "force-dynamic"
 
 import { redirect } from "next/navigation"
 import { headers } from "next/headers"
-import Link from "next/link"
 import { getAuth } from "@/lib/auth"
-import { AdminSignOut } from "./components/AdminSignOut"
-import { Logo } from "@/components/Logo"
-
-const NAV = [
-  { label: "Dashboard", href: "/admin/dashboard", icon: "▪" },
-  { label: "Appointments", href: "/admin/appointments", icon: "▪" },
-  { label: "Availability", href: "/admin/availability", icon: "▪" },
-  { label: "Patients", href: "/admin/patients", icon: "▪" },
-  { label: "Services", href: "/admin/services", icon: "▪" },
-]
+import { AdminNav } from "./components/AdminNav"
 
 export default async function AdminLayout({
   children,
@@ -32,84 +22,20 @@ export default async function AdminLayout({
         background: "var(--color-bg)",
       }}
     >
-      {/* Sidebar */}
-      <aside
-        style={{
-          width: 240,
-          flexShrink: 0,
-          background: "var(--color-brand)",
-          display: "flex",
-          flexDirection: "column",
-          position: "fixed",
-          top: 0,
-          left: 0,
-          bottom: 0,
-          zIndex: 10,
-        }}
-      >
-        {/* Logo */}
-        <div style={{ padding: "28px 20px 20px" }}>
-          <Link href='/admin/dashboard'>
-            <Logo height={54} />
-          </Link>
-        </div>
-
-        {/* Nav */}
-        <nav
-          style={{
-            flex: 1,
-            padding: "8px 12px",
-            display: "flex",
-            flexDirection: "column",
-            gap: 2,
-          }}
-        >
-          {NAV.map(({ label, href }) => (
-            <Link
-              key={href}
-              href={href}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-                padding: "9px 12px",
-                borderRadius: 10,
-                textDecoration: "none",
-                color: "rgba(255,255,255,0.85)",
-                fontSize: 14,
-                fontWeight: 500,
-              }}
-            >
-              {label}
-            </Link>
-          ))}
-        </nav>
-
-        {/* Bottom: user info + sign out */}
-        <div
-          style={{
-            padding: "16px 20px 24px",
-            borderTop: "1px solid rgba(255,255,255,0.12)",
-          }}
-        >
-          <div
-            style={{
-              fontSize: 12,
-              color: "rgba(255,255,255,0.5)",
-              marginBottom: 10,
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-            }}
-          >
-            {session.user.email}
-          </div>
-          <AdminSignOut />
-        </div>
-      </aside>
+      <AdminNav email={session.user.email} />
 
       {/* Main content */}
-      <main style={{ marginLeft: 240, flex: 1, minWidth: 0 }}>{children}</main>
+      <main
+        className="admin-shell admin-main"
+        style={{
+          flex: 1,
+          minWidth: 0,
+          minHeight: "100vh",
+          background: "var(--admin-bg)",
+        }}
+      >
+        {children}
+      </main>
     </div>
   )
 }

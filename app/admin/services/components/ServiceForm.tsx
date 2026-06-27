@@ -2,6 +2,8 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { SubmitButton } from "@/app/admin/components/SubmitButton"
+import { cardStyle as card, inputStyle, labelStyle, sectionHeadStyle as sectionHead, primaryBtnStyle, secondaryBtnStyle } from "@/app/admin/ui"
 
 type Lang = "en" | "ne"
 
@@ -15,48 +17,6 @@ export type ServiceDoc = {
   slug: string; image?: string; visible: boolean
   content: { en: LocaleContent; ne: LocaleContent }
   metaTitle?: string; metaDescription?: string; keywords?: string[]; ogImage?: string
-}
-
-const inputStyle = {
-  width: "100%",
-  padding: "11px 14px",
-  borderRadius: 8,
-  border: "1.5px solid var(--color-accent)",
-  fontSize: 16,
-  color: "var(--color-text)",
-  boxSizing: "border-box" as const,
-  fontFamily: "var(--font-sans), sans-serif",
-  background: "#fff",
-}
-
-const labelStyle = {
-  display: "block",
-  fontSize: 14,
-  fontWeight: 700,
-  color: "var(--color-text-muted)",
-  textTransform: "uppercase" as const,
-  letterSpacing: "0.04em",
-  marginBottom: 6,
-}
-
-const sectionHead = {
-  fontFamily: "var(--font-sans), sans-serif",
-  fontWeight: 700,
-  fontSize: 15,
-  color: "var(--color-text)",
-  textTransform: "uppercase" as const,
-  letterSpacing: "0.05em",
-  margin: "0 0 14px",
-  paddingBottom: 8,
-  borderBottom: "1px solid rgba(23,42,58,0.08)",
-}
-
-const card = {
-  background: "#fff",
-  borderRadius: 14,
-  padding: "22px 24px",
-  boxShadow: "0 2px 8px rgba(23,42,58,0.06)",
-  marginBottom: 16,
 }
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
@@ -76,9 +36,9 @@ function LangTab({ lang, active, onClick }: { lang: Lang; active: boolean; onCli
       style={{
         padding: "7px 20px",
         borderRadius: 8,
-        border: "1.5px solid var(--color-accent)",
-        background: active ? "var(--color-surface)" : "#fff",
-        color: active ? "var(--color-brand)" : "var(--color-text-muted)",
+        border: "1px solid var(--admin-border)",
+        background: active ? "#FAFBFC" : "#fff",
+        color: active ? "var(--color-brand)" : "var(--admin-muted)",
         fontWeight: active ? 700 : 500,
         fontSize: 15,
         cursor: "pointer",
@@ -99,7 +59,7 @@ function LocaleFields({ lang, included, setIncluded, defaults }: {
   return (
     <div>
       {/* Core text */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 14 }}>
+      <div className="admin-grid-2" style={{ gap: 14, marginBottom: 14 }}>
         <Field label="Name">
           <input name={`${lang}_name`} type="text" defaultValue={defaults?.name ?? ""} placeholder={`${p}Service name`} style={inputStyle} />
         </Field>
@@ -121,7 +81,7 @@ function LocaleFields({ lang, included, setIncluded, defaults }: {
       </Field>
 
       {/* Operational */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 14 }}>
+      <div className="admin-grid-2" style={{ gap: 14, marginBottom: 14 }}>
         <Field label="Duration">
           <input name={`${lang}_duration`} type="text" defaultValue={defaults?.duration ?? ""} placeholder={`${p}60 minutes`} style={inputStyle} />
         </Field>
@@ -174,8 +134,8 @@ function LocaleFields({ lang, included, setIncluded, defaults }: {
           style={{
             padding: "6px 14px",
             borderRadius: 7,
-            border: "1.5px solid var(--color-accent)",
-            background: "var(--color-surface)",
+            border: "1px solid var(--admin-border)",
+            background: "#FAFBFC",
             color: "var(--color-brand)",
             fontSize: 14,
             fontWeight: 600,
@@ -192,7 +152,7 @@ function LocaleFields({ lang, included, setIncluded, defaults }: {
         <div
           key={i}
           style={{
-            background: "var(--color-surface)",
+            background: "#FAFBFC",
             borderRadius: 10,
             padding: "14px 16px",
             marginBottom: 10,
@@ -243,7 +203,7 @@ export function ServiceForm({ action, initialData }: { action: (fd: FormData) =>
       {/* Service image */}
       <div style={card}>
         <div style={sectionHead}>Service image</div>
-        <div style={{ display: "flex", gap: 20, alignItems: "flex-start" }}>
+        <div style={{ display: "flex", gap: 20, alignItems: "flex-start", flexWrap: "wrap" }}>
           {/* Preview */}
           <div
             style={{
@@ -251,8 +211,8 @@ export function ServiceForm({ action, initialData }: { action: (fd: FormData) =>
               height: 105,
               borderRadius: 10,
               overflow: "hidden",
-              border: "1.5px solid var(--color-accent)",
-              background: "var(--color-surface)",
+              border: "1px solid var(--admin-border)",
+              background: "#FAFBFC",
               flexShrink: 0,
               display: "grid",
               placeItems: "center",
@@ -262,7 +222,7 @@ export function ServiceForm({ action, initialData }: { action: (fd: FormData) =>
               // eslint-disable-next-line @next/next/no-img-element
               <img src={preview} alt="Preview" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
             ) : (
-              <span style={{ fontSize: 13, color: "var(--color-text-muted)" }}>No image</span>
+              <span style={{ fontSize: 13, color: "var(--admin-muted)" }}>No image</span>
             )}
           </div>
           <div style={{ flex: 1 }}>
@@ -288,8 +248,8 @@ export function ServiceForm({ action, initialData }: { action: (fd: FormData) =>
                   display: "inline-block",
                   padding: "9px 18px",
                   borderRadius: 8,
-                  border: "1.5px solid var(--color-accent)",
-                  background: "var(--color-surface)",
+                  border: "1px solid var(--admin-border)",
+                  background: "#FAFBFC",
                   color: "var(--color-brand)",
                   fontSize: 15,
                   fontWeight: 600,
@@ -298,11 +258,11 @@ export function ServiceForm({ action, initialData }: { action: (fd: FormData) =>
               >
                 Choose image
               </label>
-              <span style={{ fontSize: 14, color: "var(--color-text-muted)" }}>
+              <span style={{ fontSize: 14, color: "var(--admin-muted)" }}>
                 {fileName ?? (preview ? "Current image" : "No file chosen")}
               </span>
             </div>
-            <p style={{ fontSize: 14, color: "var(--color-text-muted)", margin: 0 }}>
+            <p style={{ fontSize: 14, color: "var(--admin-muted)", margin: 0 }}>
               Recommended: 800×600 JPG/PNG, under 8MB.
             </p>
           </div>
@@ -324,7 +284,7 @@ export function ServiceForm({ action, initialData }: { action: (fd: FormData) =>
               onBlur={(e) => {
                 if (!isEdit) e.target.value = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-")
               }}
-              style={{ ...inputStyle, ...(isEdit ? { background: "var(--color-surface)", color: "var(--color-text-muted)" } : {}) }}
+              style={{ ...inputStyle, ...(isEdit ? { background: "#F2F4F6", color: "var(--admin-muted)" } : {}) }}
             />
           </Field>
           <div style={{ paddingBottom: 14 }}>
@@ -397,33 +357,8 @@ export function ServiceForm({ action, initialData }: { action: (fd: FormData) =>
 
       {/* Actions */}
       <div style={{ display: "flex", gap: 12 }}>
-        <button
-          type="submit"
-          style={{
-            padding: "12px 28px",
-            borderRadius: 10,
-            background: "var(--color-brand)",
-            color: "#fff",
-            fontSize: 16,
-            fontWeight: 600,
-            border: "none",
-            cursor: "pointer",
-          }}
-        >
-          {isEdit ? "Update service" : "Create service"}
-        </button>
-        <Link
-          href="/admin/services"
-          style={{
-            padding: "12px 24px",
-            borderRadius: 10,
-            border: "1.5px solid var(--color-accent)",
-            color: "var(--color-text-muted)",
-            fontSize: 16,
-            fontWeight: 500,
-            textDecoration: "none",
-          }}
-        >
+        <SubmitButton label={isEdit ? "Update service" : "Create service"} style={primaryBtnStyle} />
+        <Link href="/admin/services" style={secondaryBtnStyle}>
           Cancel
         </Link>
       </div>

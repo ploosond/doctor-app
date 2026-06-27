@@ -1,6 +1,8 @@
 "use client"
 
 import Link from "next/link"
+import { SubmitButton } from "@/app/admin/components/SubmitButton"
+import { cardStyle as card, inputStyle, labelStyle, sectionHeadStyle as sectionHead, primaryBtnStyle, secondaryBtnStyle } from "@/app/admin/ui"
 
 export type PatientDoc = {
   _id: string
@@ -16,48 +18,6 @@ export type PatientDoc = {
   referralSource?: string
   alerts?: string
   consentGiven?: boolean
-}
-
-const inputStyle = {
-  width: "100%",
-  padding: "11px 14px",
-  borderRadius: 8,
-  border: "1.5px solid var(--color-accent)",
-  fontSize: 16,
-  color: "var(--color-text)",
-  boxSizing: "border-box" as const,
-  fontFamily: "var(--font-sans), sans-serif",
-  background: "#fff",
-}
-
-const labelStyle = {
-  display: "block",
-  fontSize: 14,
-  fontWeight: 700,
-  color: "var(--color-text-muted)",
-  textTransform: "uppercase" as const,
-  letterSpacing: "0.04em",
-  marginBottom: 6,
-}
-
-const sectionHead = {
-  fontFamily: "var(--font-sans), sans-serif",
-  fontWeight: 700,
-  fontSize: 13,
-  color: "var(--color-text)",
-  textTransform: "uppercase" as const,
-  letterSpacing: "0.04em",
-  margin: "0 0 14px",
-  paddingBottom: 8,
-  borderBottom: "1px solid rgba(23,42,58,0.08)",
-}
-
-const card = {
-  background: "#fff",
-  borderRadius: 14,
-  padding: "22px 24px",
-  boxShadow: "0 2px 8px rgba(23,42,58,0.06)",
-  marginBottom: 16,
 }
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
@@ -83,7 +43,7 @@ export function PatientForm({
       {/* Identity */}
       <div style={card}>
         <div style={sectionHead}>Identity</div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+        <div className="admin-grid-2" style={{ gap: 14 }}>
           <Field label="Name *">
             <input name="name" type="text" required defaultValue={initialData?.name ?? ""} placeholder="Full name" style={inputStyle} />
           </Field>
@@ -117,7 +77,7 @@ export function PatientForm({
       {/* Emergency + referral */}
       <div style={card}>
         <div style={sectionHead}>Emergency contact & referral</div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+        <div className="admin-grid-2" style={{ gap: 14 }}>
           <Field label="Emergency contact name">
             <input name="emergencyContactName" type="text" defaultValue={initialData?.emergencyContactName ?? ""} placeholder="optional" style={inputStyle} />
           </Field>
@@ -150,32 +110,10 @@ export function PatientForm({
 
       {/* Actions */}
       <div style={{ display: "flex", gap: 12 }}>
-        <button
-          type="submit"
-          style={{
-            padding: "12px 28px",
-            borderRadius: 10,
-            background: "var(--color-brand)",
-            color: "#fff",
-            fontSize: 16,
-            fontWeight: 600,
-            border: "none",
-            cursor: "pointer",
-          }}
-        >
-          {isEdit ? "Update patient" : "Create patient"}
-        </button>
+        <SubmitButton label={isEdit ? "Update patient" : "Create patient"} style={primaryBtnStyle} />
         <Link
           href={isEdit ? `/admin/patients/${initialData!._id}` : "/admin/patients"}
-          style={{
-            padding: "12px 24px",
-            borderRadius: 10,
-            border: "1.5px solid var(--color-accent)",
-            color: "var(--color-text-muted)",
-            fontSize: 16,
-            fontWeight: 500,
-            textDecoration: "none",
-          }}
+          style={secondaryBtnStyle}
         >
           Cancel
         </Link>

@@ -4,6 +4,8 @@ import { getPatient, listVisitsByPatient } from "@/lib/services/patients"
 import { updatePatientNotes, deletePatient, addVisit, updateVisit, deleteVisit } from "../actions"
 import { VisitForm, DeleteVisitButton } from "../components/VisitForm"
 import { DeletePatientButton } from "../components/DeletePatientButton"
+import { FlashBanner } from "@/app/admin/components/FlashBanner"
+import { cardStyle, breadcrumbStyle } from "@/app/admin/ui"
 
 function formatDate(d: Date) {
   return new Date(d).toLocaleDateString("en-GB", {
@@ -26,13 +28,6 @@ function ageFrom(dob?: Date | null): string {
   return `${age} yrs`
 }
 
-const cardStyle = {
-  background: "#fff",
-  borderRadius: 16,
-  padding: "24px",
-  boxShadow: "0 2px 8px rgba(23,42,58,0.06)",
-}
-
 const sectionHead = {
   fontFamily: "var(--font-sans), sans-serif",
   fontWeight: 700,
@@ -44,10 +39,13 @@ const sectionHead = {
 
 export default async function PatientDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>
+  searchParams: Promise<{ flash?: string }>
 }) {
   const { id } = await params
+  const { flash } = await searchParams
 
   const patient = await getPatient(id)
   if (!patient) notFound()
@@ -59,35 +57,19 @@ export default async function PatientDetailPage({
   const nextFollowUp = visits.find((v) => v.followUpDate)?.followUpDate
 
   return (
-    <div style={{ padding: "36px 40px" }}>
+    <div className="admin-page">
+      <FlashBanner code={flash} />
       {/* Breadcrumb */}
-      <div style={{ fontSize: 15, color: "var(--color-text-muted)", marginBottom: 20 }}>
-        <Link href="/admin/patients" style={{ color: "var(--color-text-muted)", textDecoration: "none" }}>
+      <div style={breadcrumbStyle}>
+        <Link href="/admin/patients" style={{ color: "var(--admin-muted)", textDecoration: "none" }}>
           Patients
         </Link>
         {" / "}
         {patient.name}
       </div>
 
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 16,
-          margin: "0 0 28px",
-        }}
-      >
-        <h1
-          style={{
-            fontFamily: "var(--font-heading), serif",
-            fontWeight: 500,
-            fontSize: 26,
-            letterSpacing: "-0.01em",
-            color: "var(--color-text)",
-            margin: 0,
-          }}
-        >
+      <div className="admin-page-head">
+        <h1 className="admin-h1" style={{ margin: 0 }}>
           {patient.name}
         </h1>
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
@@ -110,7 +92,7 @@ export default async function PatientDetailPage({
             style={{
               padding: "8px 16px",
               borderRadius: 8,
-              background: "var(--color-surface)",
+              background: "#FAFBFC",
               color: "var(--color-brand)",
               fontSize: 15,
               fontWeight: 600,
@@ -158,7 +140,7 @@ export default async function PatientDetailPage({
         </div>
       )}
 
-      <div style={{ display: "grid", gridTemplateColumns: "340px 1fr", gap: 24 }}>
+      <div className="admin-grid-side">
         {/* Left column */}
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           {/* Profile */}
@@ -189,7 +171,7 @@ export default async function PatientDetailPage({
                   fontSize: 16,
                 }}
               >
-                <span style={{ color: "var(--color-text-muted)", fontWeight: 500 }}>{label}</span>
+                <span style={{ color: "var(--admin-muted)", fontWeight: 500 }}>{label}</span>
                 <span style={{ color: "var(--color-text)", fontWeight: 600, textAlign: "right", textTransform: "capitalize" }}>
                   {value as string}
                 </span>
@@ -218,7 +200,7 @@ export default async function PatientDetailPage({
                   fontSize: 16,
                 }}
               >
-                <span style={{ color: "var(--color-text-muted)", fontWeight: 500 }}>{label}</span>
+                <span style={{ color: "var(--admin-muted)", fontWeight: 500 }}>{label}</span>
                 <span style={{ color: "var(--color-text)", fontWeight: 600, textAlign: "right" }}>
                   {value}
                 </span>
@@ -243,7 +225,7 @@ export default async function PatientDetailPage({
                   width: "100%",
                   padding: "12px 14px",
                   borderRadius: 8,
-                  border: "1.5px solid var(--color-accent)",
+                  border: "1px solid var(--admin-border)",
                   fontSize: 16,
                   color: "var(--color-text)",
                   resize: "vertical",
@@ -257,7 +239,7 @@ export default async function PatientDetailPage({
                   marginTop: 8,
                   padding: "9px 18px",
                   borderRadius: 7,
-                  background: "var(--color-surface)",
+                  background: "#FAFBFC",
                   color: "var(--color-brand)",
                   fontSize: 15,
                   fontWeight: 600,
@@ -286,7 +268,7 @@ export default async function PatientDetailPage({
           </div>
 
           {visits.length === 0 ? (
-            <p style={{ color: "var(--color-text-muted)", fontSize: 16, margin: 0 }}>
+            <p style={{ color: "var(--admin-muted)", fontSize: 16, margin: 0 }}>
               No visits recorded yet.
             </p>
           ) : (
@@ -337,17 +319,17 @@ export default async function PatientDetailPage({
                     )}
                     <div style={{ display: "flex", flexWrap: "wrap", gap: "6px 20px", fontSize: 15 }}>
                       {v.diagnosis && (
-                        <span style={{ color: "var(--color-text-muted)" }}>
+                        <span style={{ color: "var(--admin-muted)" }}>
                           <strong style={{ color: "var(--color-text)" }}>Dx:</strong> {v.diagnosis as string}
                         </span>
                       )}
                       {v.medication && (
-                        <span style={{ color: "var(--color-text-muted)" }}>
+                        <span style={{ color: "var(--admin-muted)" }}>
                           <strong style={{ color: "var(--color-text)" }}>Rx:</strong> {v.medication as string}
                         </span>
                       )}
                       {v.followUpDate && (
-                        <span style={{ color: "var(--color-text-muted)" }}>
+                        <span style={{ color: "var(--admin-muted)" }}>
                           <strong style={{ color: "var(--color-text)" }}>Follow-up:</strong> {formatDate(v.followUpDate as Date)}
                         </span>
                       )}

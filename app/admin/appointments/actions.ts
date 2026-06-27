@@ -4,7 +4,30 @@ import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import * as appointments from "@/lib/services/appointments"
 import type { AppointmentMode, AppointmentStatus } from "@/lib/services/appointments"
+import { getAvailableSlotsForDate, type Slot } from "@/lib/services/booking"
 import { requireSession } from "@/lib/auth-guard"
+
+export type AdminSlot = { startISO: string; endISO: string; label: string; startLabel: string; endLabel: string }
+
+function timeLabel(d: Date) {
+  return new Date(d).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })
+}
+
+function toAdminSlots(slots: Slot[]): AdminSlot[] {
+  return slots.map((s) => ({
+    startISO: new Date(s.start).toISOString(),
+    endISO: new Date(s.end).toISOString(),
+    label: `${timeLabel(s.start)}–${timeLabel(s.end)}`,
+    startLabel: timeLabel(s.start),
+    endLabel: timeLabel(s.end),
+  }))
+}
+
+export async function adminGetSlots(dateISO: string, excludeId?: string): Promise<AdminSlot[]> {
+  await requireSession()
+  if (!dateISO) return []
+  return toAdminSlots(await getAvailableSlotsForDate(dateISO, excludeId))
+}
 
 function parseSlot(fd: FormData): { slotStart: Date; slotEnd: Date } {
   const slot = (fd.get("slot") as string)?.trim() // "startISO|endISO"
@@ -26,7 +49,7 @@ export async function createAppointment(fd: FormData) {
 
   revalidatePath("/admin/appointments")
   revalidatePath("/admin/dashboard")
-  redirect(`/admin/appointments/${id}`)
+  redirect(`/admin/appointments/${id}?flash=created`)
 }
 
 export async function updateAppointment(id: string, fd: FormData) {
@@ -42,7 +65,7 @@ export async function updateAppointment(id: string, fd: FormData) {
   revalidatePath("/admin/appointments")
   revalidatePath(`/admin/appointments/${id}`)
   revalidatePath("/admin/dashboard")
-  redirect(`/admin/appointments/${id}`)
+  redirect(`/admin/appointments/${id}?flash=updated`)
 }
 
 export async function deleteAppointment(id: string) {
@@ -50,7 +73,7 @@ export async function deleteAppointment(id: string) {
   await appointments.deleteAppointment(id)
   revalidatePath("/admin/appointments")
   revalidatePath("/admin/dashboard")
-  redirect("/admin/appointments")
+  redirect("/admin/appointments?flash=deleted")
 }
 
 export async function updateAppointmentStatus(id: string, status: string) {
@@ -59,10 +82,24 @@ export async function updateAppointmentStatus(id: string, status: string) {
   revalidatePath("/admin/appointments")
   revalidatePath(`/admin/appointments/${id}`)
   revalidatePath("/admin/dashboard")
+  redirect(`/admin/appointments/${id}?flash=status`)
+}
+
+const STATUSES: AppointmentStatus[] = ["requested", "confirmed", "completed", "cancelled", "no_show"]
+
+export async function overrideAppointmentStatus(id: string, status: string) {
+  await requireSession()
+  if (!STATUSES.includes(status as AppointmentStatus)) throw new Error("Invalid status.")
+  await appointments.setStatus(id, status, { silent: true })
+  revalidatePath("/admin/appointments")
+  revalidatePath(`/admin/appointments/${id}`)
+  revalidatePath("/admin/dashboard")
+  redirect(`/admin/appointments/${id}?flash=status`)
 }
 
 export async function updateAppointmentNotes(id: string, notes: string) {
   await requireSession()
   await appointments.setNotes(id, notes)
   revalidatePath(`/admin/appointments/${id}`)
+  redirect(`/admin/appointments/${id}?flash=notes`)
 }

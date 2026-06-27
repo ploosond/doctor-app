@@ -1,43 +1,51 @@
-"use client";
+"use client"
 
-import { useState, useEffect, useCallback } from "react";
-import { useLang } from "@/lib/i18n";
-import { ArrowRight } from "lucide-react";
-import { demoImage } from "@/lib/demo-image";
+import { useState, useEffect, useCallback } from "react"
+import { useLang } from "@/lib/i18n"
+import { ArrowRight } from "lucide-react"
 
 const CAROUSEL_SLIDES = [
-  { label: "Dr. Lila — consultations",                 img: "samples/people/smiling-man" },
-  { label: "Clinical environment — privacy & comfort", img: "samples/landscapes/girl-urban-view" },
-  { label: "Evidence-based care — therapy",            img: "samples/people/kitchen-bar" },
-  { label: "Medication management — personalized",     img: "samples/landscapes/beach-boat" },
-  { label: "Follow-up support — ongoing wellness",     img: "samples/landscapes/nature-mountains" },
-];
+  { label: "Dr. Lila — consultations", img: "/carousel/slide1.jpeg" },
+  {
+    label: "Clinical environment — privacy & comfort",
+    img: "/carousel/slide2.jpeg",
+  },
+  { label: "Evidence-based care — therapy", img: "/carousel/slide3.jpeg" },
+  {
+    label: "Medication management — personalized",
+    img: "/carousel/slide4.jpeg",
+  },
+  {
+    label: "Follow-up support — ongoing wellness",
+    img: "/carousel/slide5.jpeg",
+  },
+]
 
 export function HeroSection() {
-  const { t } = useLang();
-  const [idx, setIdx] = useState(0);
+  const { t } = useLang()
+  const [idx, setIdx] = useState(0)
 
   const next = useCallback(
     () => setIdx((i) => (i + 1) % CAROUSEL_SLIDES.length),
-    []
-  );
+    [],
+  )
   const prev = useCallback(
     () =>
       setIdx((i) => (i - 1 + CAROUSEL_SLIDES.length) % CAROUSEL_SLIDES.length),
-    []
-  );
+    [],
+  )
 
   useEffect(() => {
-    const id = setInterval(next, 5000);
-    return () => clearInterval(id);
-  }, [next]);
+    const id = setInterval(next, 5000)
+    return () => clearInterval(id)
+  }, [next])
 
-  const pct = `${((idx + 1) / CAROUSEL_SLIDES.length) * 100}%`;
+  const pct = `${((idx + 1) / CAROUSEL_SLIDES.length) * 100}%`
 
   return (
     <section
-      id="top"
-      className="hero-shell"
+      id='top'
+      className='hero-shell'
       style={{
         position: "relative",
         width: "100%",
@@ -58,9 +66,14 @@ export function HeroSection() {
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={demoImage(img, 1440, 900)}
-            alt=""
-            style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+            src={img}
+            alt=''
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              display: "block",
+            }}
           />
         </div>
       ))}
@@ -79,7 +92,7 @@ export function HeroSection() {
 
       {/* Text overlay */}
       <div
-        className="hero-text-panel"
+        className='hero-text-panel'
         style={{
           position: "absolute",
           inset: 0,
@@ -125,8 +138,8 @@ export function HeroSection() {
           }}
         >
           <a
-            href="#booking"
-            className="btn-primary"
+            href='#booking'
+            className='btn-primary'
             style={{
               display: "inline-flex",
               alignItems: "center",
@@ -153,12 +166,16 @@ export function HeroSection() {
                 marginLeft: 16,
               }}
             >
-              <ArrowRight size={18} strokeWidth={2.4} color="var(--color-brand)" />
+              <ArrowRight
+                size={18}
+                strokeWidth={2.4}
+                color='var(--color-brand)'
+              />
             </span>
           </a>
           <a
-            href="#services"
-            className="btn-primary"
+            href='#services'
+            className='btn-primary'
             style={{
               display: "inline-flex",
               alignItems: "center",
@@ -187,7 +204,7 @@ export function HeroSection() {
                 marginLeft: 16,
               }}
             >
-              <ArrowRight size={18} strokeWidth={2.4} color="#fff" />
+              <ArrowRight size={18} strokeWidth={2.4} color='#fff' />
             </span>
           </a>
         </div>
@@ -195,7 +212,7 @@ export function HeroSection() {
 
       {/* Progress bar */}
       <div
-        className="hero-progress"
+        className='hero-progress'
         style={{
           position: "absolute",
           right: 28,
@@ -256,35 +273,35 @@ export function HeroSection() {
               transition: "background 0.2s, border-color 0.2s",
             }}
             onMouseEnter={(e) => {
-              const el = e.currentTarget;
-              el.style.background = "rgba(255,255,255,0.2)";
-              el.style.borderColor = "rgba(255,255,255,0.6)";
+              const el = e.currentTarget
+              el.style.background = "rgba(255,255,255,0.2)"
+              el.style.borderColor = "rgba(255,255,255,0.6)"
             }}
             onMouseLeave={(e) => {
-              const el = e.currentTarget;
-              el.style.background = "rgba(255,255,255,0.1)";
-              el.style.borderColor = "rgba(255,255,255,0.3)";
+              const el = e.currentTarget
+              el.style.background = "rgba(255,255,255,0.1)"
+              el.style.borderColor = "rgba(255,255,255,0.3)"
             }}
           >
             <svg
               width={18}
               height={18}
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#fff"
+              viewBox='0 0 24 24'
+              fill='none'
+              stroke='#fff'
               strokeWidth={2.4}
-              strokeLinecap="round"
-              strokeLinejoin="round"
+              strokeLinecap='round'
+              strokeLinejoin='round'
             >
               {i === 0 ? (
-                <path d="M15 18l-6-6 6-6" />
+                <path d='M15 18l-6-6 6-6' />
               ) : (
-                <path d="M9 18l6-6-6-6" />
+                <path d='M9 18l6-6-6-6' />
               )}
             </svg>
           </button>
         ))}
       </div>
     </section>
-  );
+  )
 }

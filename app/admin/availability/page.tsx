@@ -1,6 +1,7 @@
 import { getAvailability } from "@/lib/services/availability"
 import { AvailabilityForm, type AvailabilityData } from "./components/AvailabilityForm"
 import { updateAvailability } from "./actions"
+import { FlashBanner } from "../components/FlashBanner"
 
 function toDateInput(d: Date | string): string {
   return new Date(d).toISOString().slice(0, 10)
@@ -8,7 +9,12 @@ function toDateInput(d: Date | string): string {
 
 type WH = { day: number; start: string; end: string; enabled?: boolean }
 
-export default async function AvailabilityPage() {
+export default async function AvailabilityPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ flash?: string }>
+}) {
+  const { flash } = await searchParams
   const doc = await getAvailability()
 
   const initialData: AvailabilityData = {
@@ -24,20 +30,12 @@ export default async function AvailabilityPage() {
   }
 
   return (
-    <div style={{ padding: "36px 40px", maxWidth: 720 }}>
-      <h1
-        style={{
-          fontFamily: "var(--font-heading), serif",
-          fontWeight: 500,
-          fontSize: 28,
-          letterSpacing: "-0.01em",
-          color: "var(--color-text)",
-          margin: "0 0 8px",
-        }}
-      >
+    <div className="admin-page">
+      <FlashBanner code={flash} />
+      <h1 className="admin-h1" style={{ margin: "0 0 8px" }}>
         Availability
       </h1>
-      <p style={{ fontSize: 15, color: "var(--color-text-muted)", margin: "0 0 28px" }}>
+      <p style={{ fontSize: 15, color: "var(--admin-muted)", margin: "0 0 28px" }}>
         Set the weekly working hours and slot rules used to generate bookable appointment slots.
       </p>
       <AvailabilityForm action={updateAvailability} initialData={initialData} />

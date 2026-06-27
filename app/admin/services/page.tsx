@@ -2,34 +2,32 @@ import Link from "next/link"
 import { listServices } from "@/lib/services/catalog"
 import { deleteService, toggleServiceVisibility } from "./actions"
 import { DeleteButton } from "./components/DeleteButton"
+import { FlashBanner } from "../components/FlashBanner"
 
 function formatDate(d: Date) {
   return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
 }
 
-export default async function ServicesAdminPage() {
+export default async function ServicesAdminPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ flash?: string }>
+}) {
+  const { flash } = await searchParams
   const services = await listServices()
 
   return (
-    <div style={{ padding: "36px 40px" }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28 }}>
-        <h1
-          style={{
-            fontFamily: "var(--font-heading), serif",
-            fontWeight: 500,
-            fontSize: 28,
-            letterSpacing: "-0.01em",
-            color: "var(--color-text)",
-            margin: 0,
-          }}
-        >
+    <div className="admin-page">
+      <FlashBanner code={flash} />
+      <div className="admin-page-head">
+        <h1 className="admin-h1" style={{ margin: 0 }}>
           Services
         </h1>
         <Link
           href="/admin/services/new"
           style={{
-            padding: "11px 22px",
-            borderRadius: 10,
+            padding: "10px 20px",
+            borderRadius: 8,
             background: "var(--color-brand)",
             color: "#fff",
             fontSize: 15,
@@ -46,9 +44,10 @@ export default async function ServicesAdminPage() {
           style={{
             padding: "60px",
             textAlign: "center",
-            color: "var(--color-text-muted)",
-            fontSize: 16,
-            background: "var(--color-surface)",
+            color: "var(--admin-muted)",
+            fontSize: 15,
+            background: "var(--admin-card)",
+            border: "1px solid var(--admin-border)",
             borderRadius: 12,
           }}
         >
@@ -59,30 +58,31 @@ export default async function ServicesAdminPage() {
         </div>
       ) : (
         <table
+          className="admin-table"
           style={{
-            width: "100%",
-            borderCollapse: "collapse",
-            fontSize: 16,
+            fontSize: 15,
             color: "var(--color-text)",
-            background: "#fff",
-            borderRadius: 14,
+            background: "var(--admin-card)",
+            border: "1px solid var(--admin-border)",
+            borderRadius: 12,
             overflow: "hidden",
-            boxShadow: "0 2px 8px rgba(23,42,58,0.06)",
+            boxShadow: "var(--admin-shadow)",
           }}
         >
           <thead>
             <tr
               style={{
-                background: "var(--color-surface)",
-                color: "var(--color-text-muted)",
-                fontSize: 14,
+                background: "#FAFBFC",
+                borderBottom: "1px solid var(--admin-border)",
+                color: "var(--admin-muted)",
+                fontSize: 12.5,
                 fontWeight: 600,
                 textTransform: "uppercase",
                 letterSpacing: "0.04em",
               }}
             >
               {["Service (EN)", "Slug", "Tag", "Visible", "Created", "Actions"].map((h) => (
-                <th key={h} style={{ textAlign: "left", padding: "14px 18px", fontWeight: 600 }}>
+                <th key={h} style={{ textAlign: "left", padding: "12px 18px", fontWeight: 600 }}>
                   {h}
                 </th>
               ))}
@@ -90,23 +90,23 @@ export default async function ServicesAdminPage() {
           </thead>
           <tbody>
             {services.map((svc) => (
-              <tr key={String(svc._id)} style={{ borderBottom: "1px solid rgba(23,42,58,0.06)" }}>
-                <td style={{ padding: "14px 18px", fontWeight: 600 }}>
+              <tr key={String(svc._id)} style={{ borderBottom: "1px solid var(--admin-border)" }}>
+                <td data-label="Service (EN)" style={{ padding: "14px 18px", fontWeight: 600 }}>
                   {(svc.content as { en: { name: string } }).en?.name ?? "—"}
                 </td>
-                <td style={{ padding: "14px 18px", color: "var(--color-text-muted)", fontFamily: "monospace", fontSize: 15 }}>
+                <td data-label="Slug" style={{ padding: "14px 18px", color: "var(--admin-muted)", fontFamily: "monospace", fontSize: 15 }}>
                   {svc.slug}
                 </td>
-                <td style={{ padding: "14px 18px", color: "var(--color-text-muted)" }}>
+                <td data-label="Tag" style={{ padding: "14px 18px", color: "var(--admin-muted)" }}>
                   {(svc.content as { en: { tag: string } }).en?.tag ?? "—"}
                 </td>
-                <td style={{ padding: "14px 18px" }}>
+                <td data-label="Visible" style={{ padding: "14px 18px" }}>
                   <form action={toggleServiceVisibility.bind(null, svc.slug)} style={{ display: "inline" }}>
                     <button
                       type="submit"
                       title={svc.visible ? "Visible — click to hide" : "Hidden — click to show"}
                       style={{
-                        color: svc.visible ? "var(--color-brand)" : "var(--color-text-muted)",
+                        color: svc.visible ? "var(--color-brand)" : "var(--admin-muted)",
                         fontWeight: 700,
                         fontSize: 16,
                         background: "none",
@@ -119,18 +119,19 @@ export default async function ServicesAdminPage() {
                     </button>
                   </form>
                 </td>
-                <td style={{ padding: "14px 18px", color: "var(--color-text-muted)" }}>
+                <td data-label="Created" style={{ padding: "14px 18px", color: "var(--admin-muted)" }}>
                   {formatDate(svc.createdAt as Date)}
                 </td>
-                <td style={{ padding: "14px 18px", whiteSpace: "nowrap" }}>
+                <td data-label="" style={{ padding: "14px 18px" }}>
                   <Link
                     href={`/services/${svc.slug}`}
                     target="_blank"
                     style={{
                       padding: "7px 14px",
-                      borderRadius: 7,
-                      background: "var(--color-surface)",
-                      color: "var(--color-text-muted)",
+                      borderRadius: 8,
+                      background: "var(--admin-card)",
+                      border: "1px solid var(--admin-border)",
+                      color: "var(--admin-muted)",
                       fontSize: 14,
                       fontWeight: 600,
                       textDecoration: "none",
@@ -143,8 +144,9 @@ export default async function ServicesAdminPage() {
                     href={`/admin/services/${svc.slug}`}
                     style={{
                       padding: "7px 14px",
-                      borderRadius: 7,
-                      background: "var(--color-surface)",
+                      borderRadius: 8,
+                      background: "var(--admin-card)",
+                      border: "1px solid var(--admin-border)",
                       color: "var(--color-brand)",
                       fontSize: 14,
                       fontWeight: 600,

@@ -1,6 +1,8 @@
 "use client"
 
 import { useState } from "react"
+import { SubmitButton } from "@/app/admin/components/SubmitButton"
+import { cardStyle as card, inputStyle, labelStyle, sectionHeadStyle as sectionHead, primaryBtnStyle } from "@/app/admin/ui"
 
 const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
@@ -11,47 +13,6 @@ export type AvailabilityData = {
   slotDurationMins: number
   bufferMins: number
   blockedDates: string[] // yyyy-mm-dd
-}
-
-const inputStyle = {
-  padding: "10px 13px",
-  borderRadius: 8,
-  border: "1.5px solid var(--color-accent)",
-  fontSize: 16,
-  color: "var(--color-text)",
-  boxSizing: "border-box" as const,
-  fontFamily: "var(--font-sans), sans-serif",
-  background: "#fff",
-}
-
-const labelStyle = {
-  display: "block",
-  fontSize: 14,
-  fontWeight: 700,
-  color: "var(--color-text-muted)",
-  textTransform: "uppercase" as const,
-  letterSpacing: "0.04em",
-  marginBottom: 6,
-}
-
-const sectionHead = {
-  fontFamily: "var(--font-sans), sans-serif",
-  fontWeight: 700,
-  fontSize: 13,
-  color: "var(--color-text)",
-  textTransform: "uppercase" as const,
-  letterSpacing: "0.04em",
-  margin: "0 0 14px",
-  paddingBottom: 8,
-  borderBottom: "1px solid rgba(23,42,58,0.08)",
-}
-
-const card = {
-  background: "#fff",
-  borderRadius: 14,
-  padding: "22px 24px",
-  boxShadow: "0 2px 8px rgba(23,42,58,0.06)",
-  marginBottom: 16,
 }
 
 export function AvailabilityForm({
@@ -75,10 +36,7 @@ export function AvailabilityForm({
           {DAYS.map((name, day) => {
             const wh = byDay.get(day)
             return (
-              <div
-                key={day}
-                style={{ display: "grid", gridTemplateColumns: "150px auto auto", gap: 14, alignItems: "center" }}
-              >
+              <div key={day} className="avail-day-row">
                 <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontSize: 16, fontWeight: 600, color: "var(--color-text)" }}>
                   <input
                     name={`enabled_${day}`}
@@ -99,7 +57,7 @@ export function AvailabilityForm({
       {/* Slot settings */}
       <div style={card}>
         <div style={sectionHead}>Slot settings</div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+        <div className="admin-grid-2" style={{ gap: 16 }}>
           <div>
             <label style={labelStyle}>Slot duration (mins)</label>
             <input name="slotDurationMins" type="number" min={5} step={5} defaultValue={initialData.slotDurationMins} style={{ ...inputStyle, width: "100%" }} />
@@ -115,7 +73,7 @@ export function AvailabilityForm({
       <div style={card}>
         <div style={sectionHead}>Blocked dates (holidays / leave)</div>
         {blocked.length === 0 && (
-          <p style={{ fontSize: 15, color: "var(--color-text-muted)", margin: "0 0 12px" }}>No blocked dates.</p>
+          <p style={{ fontSize: 15, color: "var(--admin-muted)", margin: "0 0 12px" }}>No blocked dates.</p>
         )}
         {blocked.map((d, i) => (
           <div key={i} style={{ display: "flex", gap: 8, marginBottom: 8, alignItems: "center" }}>
@@ -147,10 +105,10 @@ export function AvailabilityForm({
           type="button"
           onClick={() => setBlocked([...blocked, ""])}
           style={{
-            padding: "6px 14px",
-            borderRadius: 7,
-            border: "1.5px solid var(--color-accent)",
-            background: "var(--color-surface)",
+            padding: "7px 14px",
+            borderRadius: 8,
+            border: "1px solid var(--admin-border)",
+            background: "var(--admin-card)",
             color: "var(--color-brand)",
             fontSize: 14,
             fontWeight: 600,
@@ -161,21 +119,7 @@ export function AvailabilityForm({
         </button>
       </div>
 
-      <button
-        type="submit"
-        style={{
-          padding: "12px 28px",
-          borderRadius: 10,
-          background: "var(--color-brand)",
-          color: "#fff",
-          fontSize: 16,
-          fontWeight: 600,
-          border: "none",
-          cursor: "pointer",
-        }}
-      >
-        Save availability
-      </button>
+      <SubmitButton label="Save availability" style={primaryBtnStyle} />
     </form>
   )
 }

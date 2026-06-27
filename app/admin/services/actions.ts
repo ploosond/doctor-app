@@ -60,7 +60,7 @@ export async function createService(fd: FormData) {
   await createServiceSvc(buildInput(fd), fd.get("image") as File | null)
   revalidatePath("/admin/services")
   revalidatePath("/")
-  redirect("/admin/services")
+  redirect("/admin/services?flash=created")
 }
 
 export async function updateService(slug: string, fd: FormData) {
@@ -69,7 +69,7 @@ export async function updateService(slug: string, fd: FormData) {
   revalidatePath("/admin/services")
   revalidatePath(`/services/${slug}`)
   revalidatePath("/")
-  redirect("/admin/services")
+  redirect("/admin/services?flash=updated")
 }
 
 export async function toggleServiceVisibility(slug: string) {
@@ -78,6 +78,7 @@ export async function toggleServiceVisibility(slug: string) {
   revalidatePath("/admin/services")
   revalidatePath("/")
   revalidatePath(`/services/${slug}`)
+  redirect("/admin/services?flash=visibility")
 }
 
 export async function deleteService(slug: string) {
@@ -85,5 +86,5 @@ export async function deleteService(slug: string) {
   await deleteServiceSvc(slug)
   revalidatePath("/admin/services")
   revalidatePath("/")
-  redirect("/admin/services")
+  redirect("/admin/services?flash=deleted")
 }
